@@ -59,17 +59,29 @@ class TrainConfig:
 class ExperimentConfig:
     data_path: str = "data/tiny_shakespeare.txt"
     train_split: float = 0.9
+    tokenizer: str = "char"
+    bpe_vocab_size: int = 512
+    bpe_min_frequency: int = 2
     model: ModelConfig = field(default_factory=ModelConfig)
     train: TrainConfig = field(default_factory=TrainConfig)
 
     def __post_init__(self) -> None:
         if not 0.0 < self.train_split < 1.0:
             raise ValueError("train_split must be strictly between 0 and 1")
+        if self.tokenizer not in {"char", "bpe"}:
+            raise ValueError("tokenizer must be 'char' or 'bpe'")
+        if self.bpe_vocab_size <= 4:
+            raise ValueError("bpe_vocab_size must be greater than 4")
+        if self.bpe_min_frequency <= 0:
+            raise ValueError("bpe_min_frequency must be positive")
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "data_path": self.data_path,
             "train_split": self.train_split,
+            "tokenizer": self.tokenizer,
+            "bpe_vocab_size": self.bpe_vocab_size,
+            "bpe_min_frequency": self.bpe_min_frequency,
             "model": asdict(self.model),
             "train": asdict(self.train),
         }
@@ -137,6 +149,9 @@ def load_config(path: str | Path) -> ExperimentConfig:
     return ExperimentConfig(
         data_path=str(raw.get("data_path", "data/tiny_shakespeare.txt")),
         train_split=float(raw.get("train_split", 0.9)),
+        tokenizer=str(raw.get("tokenizer", "char")),
+        bpe_vocab_size=int(raw.get("bpe_vocab_size", 512)),
+        bpe_min_frequency=int(raw.get("bpe_min_frequency", 2)),
         model=model,
         train=train,
     )

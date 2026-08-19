@@ -1,4 +1,8 @@
-"""The complete small character-level causal Transformer language model."""
+"""The complete small causal Transformer language model.
+
+The v13 class name is kept for backwards compatibility; the model consumes
+integer token ids and therefore also supports the v14 BPE tokenizer.
+"""
 
 from __future__ import annotations
 
@@ -107,3 +111,7 @@ class CharTransformerLM(nn.Module):
             raise ValueError("targets must have the same shape as input_ids")
         loss = F.cross_entropy(logits.reshape(-1, self.vocab_size), targets.reshape(-1))
         return logits, loss
+
+
+# New code may use the tokenizer-agnostic name without breaking v13 users.
+CausalTransformerLM = CharTransformerLM

@@ -65,6 +65,25 @@ Greedy decoding is selected with `--temperature 0`; sampling is selected by
 using a positive temperature. `--top-k` may be omitted to sample from the
 full vocabulary.
 
+## v14 BPE experiment
+
+The original v13 character-level path remains unchanged. The v14 path adds a
+dependency-free BPE tokenizer and a larger small Transformer while reusing the
+same attention, masking, dataset-window, checkpoint, and test code:
+
+```bash
+python scripts/train_v14.py --config configs/v14_bpe.yaml --device cuda
+python scripts/generate_v14.py \
+  --checkpoint checkpoints/v14_bpe/best.pt \
+  --prompt "To be, or not to be:" \
+  --max-new-tokens 120 --temperature 0.7 --top-k 40 --top-p 0.9 --seed 7
+```
+
+The v14 checkpoint uses the current bundled Shakespeare dataset. It is an
+educational from-scratch model: BPE improves word boundaries and local
+coherence, but it does not guarantee that every generated sentence has
+complete semantics.
+
 ## Verified run
 
 The repository was also run end-to-end in a private Kaggle Notebook using the

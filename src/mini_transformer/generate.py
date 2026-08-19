@@ -15,6 +15,8 @@ def generate(
     max_new_tokens: int,
     temperature: float = 1.0,
     top_k: int | None = None,
+    top_p: float | None = None,
+    repetition_penalty: float = 1.0,
     seed: int | None = None,
 ) -> str:
     """Generate text, recomputing the full context at every step.
@@ -27,6 +29,10 @@ def generate(
         raise ValueError("max_new_tokens cannot be negative")
     if top_k is not None and top_k <= 0:
         raise ValueError("top_k must be positive when provided")
+    if top_p is not None and not 0.0 < top_p <= 1.0:
+        raise ValueError("top_p must be in (0, 1]")
+    if repetition_penalty <= 0.0:
+        raise ValueError("repetition_penalty must be positive")
     device = next(model.parameters()).device
     model.eval()
     if seed is not None:
@@ -42,6 +48,12 @@ def generate(
         for _ in range(max_new_tokens):
             input_ids = torch.tensor([generated_ids[-block_size:]], dtype=torch.long, device=device)
             logits = model(input_ids)[:, -1, :]
+            if repetition_penalty != 1.0:
+                for token_id in set(generated_ids):
+                    if logits[0, token_id] < 0:
+                        logits[0, token_id] *= repetition_penalty
+                    else:
+                        logits[0, token_id] /= repetition_penalty
             if temperature <= 0:
                 next_id = torch.argmax(logits, dim=-1).item()
             else:
@@ -50,6 +62,18 @@ def generate(
                     k = min(top_k, logits.shape[-1])
                     values, _ = torch.topk(logits, k)
                     logits = logits.masked_fill(logits < values[:, [-1]], float("-inf"))
+                if top_p is not None:
+                    sorted_logits, sorted_indices = torch.sort(logits, descending=True)
+                    cumulative_probabilities = torch.cumsum(
+                        torch.softmax(sorted_logits, dim=-1), dim=-1
+                    )
+                    remove = cumulative_probabilities > top_p
+                    remove[..., 1:] = remove[..., :-1].clone()
+                    remove[..., 0] = False
+                    sorted_logits = sorted_logits.masked_fill(remove, float("-inf"))
+                    logits = torch.full_like(logits, float("-inf")).scatter(
+                        -1, sorted_indices, sorted_logits
+                    )
                 probabilities = torch.softmax(logits, dim=-1)
                 next_id = torch.multinomial(probabilities, num_samples=1).item()
             generated_ids.append(next_id)
