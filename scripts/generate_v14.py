@@ -20,7 +20,19 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Generate text from a v14 BPE checkpoint.")
     parser.add_argument("--checkpoint", default=str(ROOT / "checkpoints" / "v14_bpe" / "best.pt"))
     parser.add_argument("--prompt", default="To be, or not to be:")
-    parser.add_argument("--max-new-tokens", type=int, default=120)
+    parser.add_argument("--max-new-tokens", type=int, default=96)
+    parser.add_argument(
+        "--min-new-tokens",
+        type=int,
+        default=24,
+        help="do not stop at sentence punctuation before this many new tokens",
+    )
+    parser.add_argument(
+        "--stop-at-sentence",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="stop after a complete terminal-punctuation boundary (default: on)",
+    )
     parser.add_argument("--temperature", type=float, default=0.7)
     parser.add_argument("--top-k", type=int, default=40)
     parser.add_argument("--top-p", type=float, default=0.9)
@@ -57,6 +69,8 @@ def main() -> None:
             top_p=args.top_p,
             repetition_penalty=args.repetition_penalty,
             seed=args.seed,
+            min_new_tokens=args.min_new_tokens,
+            stop_on_sentence_end=args.stop_at_sentence,
         )
     )
 

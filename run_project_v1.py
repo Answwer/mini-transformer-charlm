@@ -130,6 +130,8 @@ def main() -> None:
             top_p=0.9,
             repetition_penalty=1.05,
             seed=7,
+            min_new_tokens=24,
+            stop_on_sentence_end=True,
         )
 
     summary = {

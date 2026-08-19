@@ -77,7 +77,8 @@ python scripts/train_v14.py --config configs/v14_bpe.yaml --device cuda
 python scripts/generate_v14.py \
   --checkpoint checkpoints/v14_bpe/best.pt \
   --prompt "To be, or not to be:" \
-  --max-new-tokens 120 --temperature 0.7 --top-k 40 --top-p 0.9 --seed 7
+  --max-new-tokens 96 --min-new-tokens 24 \
+  --temperature 0.7 --top-k 40 --top-p 0.9 --seed 7
 ```
 
 The v14 checkpoint uses the current bundled Shakespeare dataset. It is an
@@ -89,6 +90,8 @@ the best model.
 
 Both generation CLIs default to `best.pt` and refuse `last.pt` unless
 `--allow-last` is explicitly supplied for an overfitting comparison.
+The v14 CLI also stops at terminal punctuation after a minimum continuation
+length, so the displayed result is less likely to end in a half sentence.
 
 For example, the input prompt `To be, or not to be:` is extended by predicting
 one BPE token at a time. A successful run can produce speaker labels, whole
@@ -104,7 +107,7 @@ network download at runtime:
 - Kaggle notebook: [Mini Transformer BPE LM v1](https://www.kaggle.com/code/answerr5/mini-transformer-bpe-lm-v1)
 - Hardware: Tesla P100 GPU
 - PyTorch: `2.5.1+cu124`
-- Tests in the Kaggle v1 run: `13/13 passed`; current local suite: `15/15 passed`
+- Tests in the Kaggle v1 run: `13/13 passed`; current local suite: `17/17 passed`
 - Training: `120,000` configured steps; the reported checkpoint was selected
   by validation loss
 - Best validation loss: `2.3789`
@@ -130,6 +133,11 @@ Should not be full of sorrow to the foe.
 This is still a deliberately small from-scratch model. The output is more
 readable than the v13 character baseline, but it is not a guarantee of
 complete sentence-level semantics.
+
+The sentence boundary guard only removes avoidable truncation. It cannot
+verify whether a sentence is factually or semantically correct. Improving
+that requires more varied text and training capacity, or a separately tracked
+pretrained-model fine-tuning route.
 
 ## Repository layout
 

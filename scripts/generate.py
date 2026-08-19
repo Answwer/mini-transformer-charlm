@@ -21,6 +21,13 @@ def main() -> None:
     parser.add_argument("--checkpoint", default=str(ROOT / "checkpoints" / "best.pt"))
     parser.add_argument("--prompt", default="The ")
     parser.add_argument("--max-new-tokens", type=int, default=120)
+    parser.add_argument("--min-new-tokens", type=int, default=0)
+    parser.add_argument(
+        "--stop-at-sentence",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="stop after terminal punctuation once min-new-tokens is reached",
+    )
     parser.add_argument("--temperature", type=float, default=0.8)
     parser.add_argument("--top-k", type=int, default=20)
     parser.add_argument("--seed", type=int, default=7)
@@ -52,6 +59,8 @@ def main() -> None:
         temperature=args.temperature,
         top_k=args.top_k,
         seed=args.seed,
+        min_new_tokens=args.min_new_tokens,
+        stop_on_sentence_end=args.stop_at_sentence,
     )
     print(result)
 

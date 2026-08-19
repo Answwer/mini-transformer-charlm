@@ -1,11 +1,21 @@
-"""Autoregressive text generation for a trained character language model."""
+"""Autoregressive text generation for a trained language model."""
 
 from __future__ import annotations
 
 import torch
 from torch import nn
+import re
 
 from .tokenizer import CharacterTokenizer
+
+
+_SENTENCE_END = re.compile(r"[.!?][\"')\]}]*$")
+
+
+def _has_sentence_end(text: str) -> bool:
+    """Return whether the generated text currently ends at sentence punctuation."""
+
+    return bool(_SENTENCE_END.search(text.rstrip()))
 
 
 def generate(
@@ -18,15 +28,25 @@ def generate(
     top_p: float | None = None,
     repetition_penalty: float = 1.0,
     seed: int | None = None,
+    min_new_tokens: int = 0,
+    stop_on_sentence_end: bool = False,
 ) -> str:
     """Generate text, recomputing the full context at every step.
 
     ``temperature <= 0`` selects greedy decoding. For sampling, ``top_k``
-    restricts the distribution before multinomial sampling.
+    restricts the distribution before multinomial sampling. When
+    ``stop_on_sentence_end`` is enabled, generation continues until at least
+    ``min_new_tokens`` have been produced and then stops at ``.``, ``!`` or
+    ``?``. This avoids presenting a truncated final clause as a complete
+    result; it is a decoding guard, not a semantic correctness guarantee.
     """
 
     if max_new_tokens < 0:
         raise ValueError("max_new_tokens cannot be negative")
+    if min_new_tokens < 0:
+        raise ValueError("min_new_tokens cannot be negative")
+    if min_new_tokens > max_new_tokens:
+        raise ValueError("min_new_tokens cannot exceed max_new_tokens")
     if top_k is not None and top_k <= 0:
         raise ValueError("top_k must be positive when provided")
     if top_p is not None and not 0.0 < top_p <= 1.0:
@@ -45,7 +65,7 @@ def generate(
     generated_ids = list(context_ids)
     block_size = model.config.block_size
     with torch.no_grad():
-        for _ in range(max_new_tokens):
+        for generated_count in range(1, max_new_tokens + 1):
             input_ids = torch.tensor([generated_ids[-block_size:]], dtype=torch.long, device=device)
             logits = model(input_ids)[:, -1, :]
             if repetition_penalty != 1.0:
@@ -77,6 +97,12 @@ def generate(
                 probabilities = torch.softmax(logits, dim=-1)
                 next_id = torch.multinomial(probabilities, num_samples=1).item()
             generated_ids.append(next_id)
-            if next_id == tokenizer.eos_id:
+            if next_id == tokenizer.eos_id and generated_count >= min_new_tokens:
+                break
+            if (
+                stop_on_sentence_end
+                and generated_count >= min_new_tokens
+                and _has_sentence_end(tokenizer.decode(generated_ids))
+            ):
                 break
     return tokenizer.decode(generated_ids)
