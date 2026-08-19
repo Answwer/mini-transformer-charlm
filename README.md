@@ -1,9 +1,10 @@
-# Mini Transformer Character LM
+# Mini Transformer Language Model
 
-This repository is a small, self-contained character-level causal language
-model built from PyTorch primitives. It trains on the included tiny
-Shakespeare corpus, evaluates on a contiguous held-out suffix, saves a
-reproducible checkpoint, and generates Shakespeare-like character sequences.
+This repository contains two small, self-contained causal language-model
+paths built from PyTorch primitives: v13 character-level training for a clear
+baseline, and v14 BPE training for better word boundaries and local text
+coherence. Both paths train on the included tiny Shakespeare corpus, evaluate
+on a held-out suffix, save reproducible checkpoints, and generate new text.
 
 The code is intentionally explicit: the data windows, causal mask, Q/K/V
 projections, attention weights, next-token loss, training loop, and sampling
@@ -82,32 +83,53 @@ python scripts/generate_v14.py \
 The v14 checkpoint uses the current bundled Shakespeare dataset. It is an
 educational from-scratch model: BPE improves word boundaries and local
 coherence, but it does not guarantee that every generated sentence has
-complete semantics.
+complete semantics. The default v14 configuration also uses validation-based
+early stopping, so the final training step is not automatically treated as
+the best model.
+
+Both generation CLIs default to `best.pt` and refuse `last.pt` unless
+`--allow-last` is explicitly supplied for an overfitting comparison.
+
+For example, the input prompt `To be, or not to be:` is extended by predicting
+one BPE token at a time. A successful run can produce speaker labels, whole
+words, punctuation, and line breaks; it is not translating the prompt or
+answering a question. It is learning the statistical continuation style of
+the training corpus.
 
 ## Verified run
 
-The repository was also run end-to-end in a private Kaggle Notebook using the
-included corpus and no network download at runtime:
+The v14 path was run end-to-end in Kaggle using the included corpus and no
+network download at runtime:
 
-- Kaggle run: [Mini Transformer Character LM v5](https://www.kaggle.com/code/answerr5/mini-transformer-character-lm-v5)
-- PyTorch: `2.10.0+cu128`
-- Tests: `10 passed`
-- Training: `1,000` steps on CPU (Kaggle's Tesla P100 was below this PyTorch
-  build's supported CUDA capability)
-- Final train loss: `2.1624`
-- Final validation loss: `2.1877`
+- Kaggle notebook: [Mini Transformer BPE LM v1](https://www.kaggle.com/code/answerr5/mini-transformer-bpe-lm-v1)
+- Hardware: Tesla P100 GPU
+- PyTorch: `2.5.1+cu124`
+- Tests in the Kaggle v1 run: `13/13 passed`; current local suite: `15/15 passed`
+- Training: `120,000` configured steps; the reported checkpoint was selected
+  by validation loss
+- Best validation loss: `2.3789`
+- Final training loss: `0.2486`
+- Final validation loss: `4.0318`
+- Best-checkpoint perplexity: `10.79`
 
-Example generated output from that run:
+The validation loss rose after the best checkpoint, which is the expected
+overfitting signal. Generation therefore loads `best.pt`, not `last.pt`.
+
+Example generated output from the best checkpoint:
 
 ```text
-The huthee anst thipe tin saustig
-Farnd, at way tout sullind I it sead shind aterer,
-I now int forel and end toe grece, you
+To be, or not to be:
+And now, I am a fellow, if I am not of you.
+
+DUKE OF YORK:
+Why, I know the title of the king before him,
+And send it against the pattern of the battlements,
+Should not be full of sorrow to the foe.
 ```
 
-This is a deliberately small character model, so the sample has recognizable
-Shakespeare-like punctuation, line breaks, and character patterns but is not
-intended to match a production language model.
+This is still a deliberately small from-scratch model. The output is more
+readable than the v13 character baseline, but it is not a guarantee of
+complete sentence-level semantics.
 
 ## Repository layout
 
@@ -141,20 +163,20 @@ mini-transformer-charlm/
 
 ## Data flow and tensor shapes
 
-The tokenizer maps every character to one id. The four reserved ids are
-stable: `<pad>=0`, `<bos>=1`, `<eos>=2`, and `<unk>=3`. The remaining
-characters are sorted by Unicode code point.
+The v13 tokenizer maps every character to one id. The v14 tokenizer maps
+characters and learned subword pieces to ids. Both keep the four reserved ids
+stable: `<pad>=0`, `<bos>=1`, `<eos>=2`, and `<unk>=3`.
 
-The full character stream is split without shuffling: the first 90% is train
-and the final 10% is validation. For each sampled offset `i`, the dataset
-returns:
+The encoded stream is split without shuffling: the first 90% is train and the
+final 10% is validation. For each sampled offset `i`, the dataset returns:
 
 ```text
 x = ids[i : i + T]       # [T]
 y = ids[i + 1 : i + T + 1] # [T]
 ```
 
-After batching, both are `[B, T]`. The model looks up token embeddings and
+After batching, both are `[B, T]`. For v13 `T` counts characters; for v14 `T`
+counts BPE tokens. The model looks up token embeddings and
 adds sinusoidal positions, producing `[B, T, C]`. Each attention layer splits
 this into `[B, H, T, D]`, computes scores `[B, H, T, T]`, masks all future
 positions, and merges heads back to `[B, T, C]`. The final vocabulary
@@ -187,6 +209,7 @@ not an accidental implementation detail.
 | batch size | 32 |
 | learning rate | 3e-4 |
 | training steps | 1,000 |
+| early stopping | disabled in `tiny.yaml`; enabled in v14 |
 
 The implementation asserts that `n_embd % n_head == 0` and checks sequence
 lengths before attention. `--debug-shapes` is not needed because
@@ -197,11 +220,12 @@ training log readable.
 ## Checkpoints and reproducibility
 
 `best.pt` and `last.pt` contain model and optimizer state, model/training
-configuration, tokenizer vocabulary, current step, best validation loss, and
-the seed. Loading uses `map_location`, so a CPU machine can load a checkpoint
-created on CUDA. Training seeds Python and PyTorch (including CUDA when
-available); batch sampling uses dedicated seeded generators for train and
-validation.
+configuration, tokenizer vocabulary, current step, best validation loss,
+best step, tokens seen, early-stopping counters, and the seed. Loading uses
+`map_location`, so a CPU machine can load a checkpoint created on CUDA.
+Training seeds Python and PyTorch; training batches use a dedicated seeded
+generator, while validation uses a fixed evenly spaced set of windows so
+checkpoint comparisons are stable.
 
 Resume a run with:
 
@@ -231,10 +255,12 @@ whether the model is in training mode—in that order.
 
 ## Known limitations and next steps
 
-- The tokenizer is character-level, so the vocabulary is simple but sequences
-  are longer than with BPE or SentencePiece.
+- The v13 tokenizer is character-level, so its sequences are longer than v14
+  BPE or SentencePiece sequences.
+- The v14 BPE tokenizer is intentionally compact and educational; it is not a
+  drop-in replacement for a production tokenizer.
 - Generation recomputes the entire context at every step and has no KV cache;
   this is intentionally straightforward and is not production optimized.
 - The project is a teaching/reference implementation, not a production LM.
-- Future extensions could add BPE/SentencePiece, Hugging Face `datasets`,
+- Future extensions could add SentencePiece, Hugging Face `datasets`,
   `accelerate`, mixed precision, benchmark tooling, and PEFT/LoRA adapters.

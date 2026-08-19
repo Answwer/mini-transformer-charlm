@@ -25,7 +25,18 @@ def main() -> None:
     parser.add_argument("--top-k", type=int, default=20)
     parser.add_argument("--seed", type=int, default=7)
     parser.add_argument("--device", default="auto")
+    parser.add_argument(
+        "--allow-last",
+        action="store_true",
+        help="allow the intentionally overfit last.pt checkpoint for comparison",
+    )
     args = parser.parse_args()
+
+    if Path(args.checkpoint).name.lower() == "last.pt" and not args.allow_last:
+        raise ValueError(
+            "Refusing to generate from last.pt; use best.pt, or add --allow-last "
+            "only for an explicit overfitting comparison."
+        )
 
     device = resolve_device(args.device)
     checkpoint = torch.load(args.checkpoint, map_location=device, weights_only=False)

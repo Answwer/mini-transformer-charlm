@@ -37,6 +37,8 @@ class TrainConfig:
     max_steps: int = 1000
     eval_interval: int = 100
     eval_steps: int = 20
+    early_stopping_patience: int = 0
+    early_stopping_min_delta: float = 0.0
     grad_clip: float = 1.0
     seed: int = 1337
     device: str = "auto"
@@ -51,6 +53,10 @@ class TrainConfig:
             raise ValueError("max_steps cannot be negative")
         if self.eval_interval <= 0 or self.eval_steps <= 0:
             raise ValueError("eval_interval and eval_steps must be positive")
+        if self.early_stopping_patience < 0:
+            raise ValueError("early_stopping_patience cannot be negative")
+        if self.early_stopping_min_delta < 0:
+            raise ValueError("early_stopping_min_delta cannot be negative")
         if self.grad_clip < 0:
             raise ValueError("grad_clip cannot be negative")
 
@@ -139,6 +145,8 @@ def load_config(path: str | Path) -> ExperimentConfig:
         "max_steps",
         "eval_interval",
         "eval_steps",
+        "early_stopping_patience",
+        "early_stopping_min_delta",
         "grad_clip",
         "seed",
         "device",

@@ -1,7 +1,8 @@
-"""Memory-efficient contiguous character windows for next-token prediction."""
+"""Memory-efficient contiguous token windows for next-token prediction."""
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from pathlib import Path
 
 import torch
@@ -87,3 +88,35 @@ class CharDataset:
         x = torch.stack([source[start][0] for start in starts.tolist()])
         y = torch.stack([source[start][1] for start in starts.tolist()])
         return x.to(device), y.to(device)
+
+    def iter_evaluation_batches(
+        self,
+        split: str,
+        batch_size: int,
+        eval_steps: int,
+        device: torch.device | str = "cpu",
+    ) -> Iterator[tuple[Tensor, Tensor]]:
+        """Yield a fixed, evenly spaced set of evaluation windows.
+
+        Training batches are intentionally random, but validation must not
+        change from one checkpoint to the next just because a new random
+        sample happened to be drawn.  Evenly spaced starts cover the whole
+        split while keeping the evaluation budget bounded by ``eval_steps``.
+        """
+        if batch_size <= 0:
+            raise ValueError("batch_size must be positive")
+        if eval_steps <= 0:
+            raise ValueError("eval_steps must be positive")
+        source = self.split(split)
+        count = min(len(source), batch_size * eval_steps)
+        max_start = len(source) - 1
+        if count == 1:
+            starts = torch.zeros(1, dtype=torch.long)
+        else:
+            starts = torch.linspace(0, max_start, count, dtype=torch.float64).round().long()
+            starts = torch.unique_consecutive(starts)
+        for offset in range(0, len(starts), batch_size):
+            batch_starts = starts[offset : offset + batch_size].tolist()
+            x = torch.stack([source[start][0] for start in batch_starts])
+            y = torch.stack([source[start][1] for start in batch_starts])
+            yield x.to(device), y.to(device)
