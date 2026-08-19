@@ -65,6 +65,31 @@ Greedy decoding is selected with `--temperature 0`; sampling is selected by
 using a positive temperature. `--top-k` may be omitted to sample from the
 full vocabulary.
 
+## Verified run
+
+The repository was also run end-to-end in a private Kaggle Notebook using the
+included corpus and no network download at runtime:
+
+- Kaggle run: [Mini Transformer Character LM v5](https://www.kaggle.com/code/answerr5/mini-transformer-character-lm-v5)
+- PyTorch: `2.10.0+cu128`
+- Tests: `10 passed`
+- Training: `1,000` steps on CPU (Kaggle's Tesla P100 was below this PyTorch
+  build's supported CUDA capability)
+- Final train loss: `2.1624`
+- Final validation loss: `2.1877`
+
+Example generated output from that run:
+
+```text
+The huthee anst thipe tin saustig
+Farnd, at way tout sullind I it sead shind aterer,
+I now int forel and end toe grece, you
+```
+
+This is a deliberately small character model, so the sample has recognizable
+Shakespeare-like punctuation, line breaks, and character patterns but is not
+intended to match a production language model.
+
 ## Repository layout
 
 ```text
