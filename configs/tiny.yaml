@@ -1,0 +1,19 @@
+# All paths are resolved relative to the repository root when using the scripts.
+data_path: data/tiny_shakespeare.txt
+train_split: 0.9
+
+block_size: 128
+n_layer: 2
+n_head: 4
+n_embd: 128
+dropout: 0.0
+
+batch_size: 32
+learning_rate: 0.0003
+max_steps: 1000
+eval_interval: 100
+eval_steps: 20
+grad_clip: 1.0
+seed: 1337
+device: auto
+checkpoint_dir: checkpoints

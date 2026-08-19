@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+.coverage
+htmlcov/
+
+# Training artifacts and local logs.
+checkpoints/*.pt
+checkpoints/*.pth
+checkpoints/*.json
+logs/
+outputs/
+work/
