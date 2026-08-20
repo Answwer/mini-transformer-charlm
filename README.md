@@ -202,6 +202,21 @@ The generated samples still contain occasional repetition, half-lines, and
 semantic jumps, so the metric improvement is not a claim of full sentence-level
 understanding.
 
+The next isolated refinement uses the v4 checkpoint as its parent and writes to
+a new directory:
+
+```bash
+python scripts/train_v14.py \
+  --config configs/v5_bpe_expanded_optimize.yaml \
+  --resume /path/to/v4/best.pt \
+  --device cuda
+```
+
+The v5 configuration lowers the continuation learning rate to `1e-5`, keeps the
+512-token BPE vocabulary and 4-layer/256-width model unchanged, and uses a
+separate `checkpoints/v14_bpe_expanded_optimize_v5` directory. It must beat
+`2.350902` on expanded validation to replace v4; otherwise v4 remains active.
+
 ## Repository layout
 
 ```text
