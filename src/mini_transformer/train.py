@@ -185,6 +185,28 @@ def train_model(
         print(f"Resumed from {resume_path} at step {start_step}")
 
     checkpoint_dir = ensure_directory(train_config.checkpoint_dir)
+    if (
+        resume_path is not None
+        and not reset_best_on_resume
+        and not (checkpoint_dir / "best.pt").is_file()
+    ):
+        # Keep the parent model selectable when a refinement run never beats it.
+        save_checkpoint(
+            checkpoint_dir / "best.pt",
+            model,
+            optimizer,
+            model_config,
+            train_config,
+            tokenizer,
+            start_step,
+            best_val_loss,
+            tokens_seen=initial_tokens_seen,
+            best_step=best_step,
+            evaluations_without_improvement=evaluations_without_improvement,
+            metrics=checkpoint.get("metrics", {}) if checkpoint is not None else {},
+            train_generator_state=train_generator.get_state(),
+            checkpoint_metadata=run_metadata,
+        )
     model.train()
     print(f"device={device} parameters={model.num_parameters():,}")
     print(f"config model={asdict(model_config)} train={asdict(train_config)}")

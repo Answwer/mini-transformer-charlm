@@ -1,0 +1,30 @@
+# Independent refinement of v14_bpe_expanded_continue.
+# Resume from the current expanded-data best.pt; never overwrite its directory.
+data_path: data/expanded/dataset-expand.txt
+replay_data_path: data/tiny_shakespeare.txt
+split_manifest_path: data/expanded/format_report.json
+old_data_ratio: 0.15
+reset_best_on_resume: false
+train_split: 0.9
+tokenizer: bpe
+bpe_vocab_size: 512
+bpe_min_frequency: 2
+
+# These values must remain identical to both parent checkpoints.
+block_size: 256
+n_layer: 4
+n_head: 8
+n_embd: 256
+dropout: 0.1
+
+batch_size: 16
+learning_rate: 0.00003
+max_steps: 60000
+eval_interval: 1000
+eval_steps: 10
+early_stopping_patience: 10
+early_stopping_min_delta: 0.0005
+grad_clip: 1.0
+seed: 1337
+device: auto
+checkpoint_dir: checkpoints/v14_bpe_expanded_optimize
