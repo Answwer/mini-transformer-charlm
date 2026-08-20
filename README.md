@@ -99,33 +99,34 @@ words, punctuation, and line breaks; it is not translating the prompt or
 answering a question. It is learning the statistical continuation style of
 the training corpus.
 
-## Historical v14, v4 baseline, and current v5
+## Historical v14, v4/v5 baselines, and current v6
 
 The original from-scratch v14 run is preserved as a read-only historical
 reference. Its checkpoint, Kaggle notebook, and output bundle live under the
 local `work/history_v14_*` directories and are never used as the active
 training output.
 
-The active expanded-data result is v5, a lower-learning-rate continuation from
-the immutable v4 checkpoint:
+The active expanded-data result is v6, selected by expanded validation loss
+after two independent continuations from the immutable v4 checkpoint:
 
-- Kaggle notebook: [Mini Transformer BPE LM Expanded Optimize v5](https://www.kaggle.com/code/answerr5/mini-transformer-bpe-lm-expanded-optimize-v5)
+- Kaggle notebook: [Mini Transformer BPE LM Expanded Optimize v6](https://www.kaggle.com/code/answerr5/mini-transformer-bpe-lm-expanded-optimize-v6)
 - Hardware: Tesla P100 GPU; PyTorch: `2.5.1+cu124`
 - Current local suite: `21/21 passed`
-- Best step: `64,000`; tokens seen: `262,144,000`
-- Expanded validation loss: `2.347299`; perplexity: `10.457`
-- Expanded test loss: `1.999644`; perplexity: `7.386`
+- Best step: `80,000`; tokens seen: `327,680,000`
+- Expanded validation loss: `2.344260`; perplexity: `10.426`
+- Expanded test loss: `2.003474`; perplexity: `7.415`
 - Historical v14 validation loss: `2.3789`; perplexity: `10.79`
-- Old-corpus validation loss: `1.913685`; perplexity: `6.778`
-- v5 best checkpoint SHA-256: `b59ca3a20923391979b702cf44c9a4d56162f9c8593524d814ffcf6ba41c6c93`
+- Old-corpus validation loss: `1.906484`; perplexity: `6.729`
+- v6 best checkpoint SHA-256: `3e01a1df97b1498c1ce5899397f9aea2dc3ecd8ad6b6921e7d6e4d6b3b3033cd`
 
 The v4 result remains an immutable comparison baseline in its own
-`work/kaggle_expanded_optimize_output_v4` directory. The v5 result is stored in
-the separate `work/kaggle_v5_output` directory. Historical v14 artifacts remain
-available for fixed-prompt comparison and are not overwritten.
+`work/kaggle_expanded_optimize_output_v4` directory. The v5 and v6 results are
+stored in the separate `work/kaggle_v5_output` and `work/kaggle_v6_output`
+directories. Historical v14 artifacts remain available for fixed-prompt
+comparison and are not overwritten.
 
 The historical v14 validation loss rose after its best checkpoint, which is
-the expected overfitting signal. Historical v14, v4, and v5 generation load
+the expected overfitting signal. Historical v14, v4, v5, and v6 generation load
 `best.pt`, not `last.pt`.
 
 Example generated output from the best checkpoint:
@@ -192,24 +193,47 @@ was reset for the new validation set. Use `scripts/generate_v14.py` with the
 new experiment's `best.pt` for generation; the historical v14 checkpoints
 remain available for fixed-prompt comparison.
 
-## v4 and v5 comparison
+## v4, v5, and v6 comparison
 
-| Result | Expanded validation loss | PPL | Old validation loss | Best step | Tokens seen |
+| Result | Expanded val loss / PPL | Expanded test loss / PPL | Old val loss / PPL | Best step | Tokens seen |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Historical v14 | 2.3789 | 10.79 | not measured | selected by validation | not recorded |
-| Baseline v4 | 2.350902 | 10.495 | 1.921622 | 60,000 | 245,760,000 |
-| Current v5 | 2.347299 | 10.457 | 1.913685 | 64,000 | 262,144,000 |
+| Historical v14 | 2.3789 / 10.79 | not measured | not measured | selected by validation | not recorded |
+| Baseline v4 | 2.350902 / 10.495 | 2.232163 / 9.320 | 1.921622 / 6.832 | 60,000 | 245,760,000 |
+| Baseline v5 | 2.347299 / 10.457 | 1.999644 / 7.386 | 1.913685 / 6.778 | 64,000 | 262,144,000 |
+| Current v6 | 2.344260 / 10.426 | 2.003474 / 7.415 | 1.906484 / 6.729 | 80,000 | 327,680,000 |
 
-Under the same BPE family, v5 improves the expanded validation loss over v4 by
-`0.003604` and over historical v14 by `0.031588`; its expanded test PPL is
-`7.386` versus v4's `9.32`. These are next-token metrics, not a claim of full
-sentence-level understanding.
+Under the same BPE family, v6 improves expanded validation loss over v4 by
+`0.006643` and over v5 by `0.003039`; old-corpus validation is also lowest at
+`1.906484`. v5 remains slightly better on expanded test PPL (`7.386` versus
+v6's `7.415`). These are next-token metrics, not a claim of full sentence-level
+understanding.
 The generated samples still contain occasional repetition, half-lines, and
 semantic jumps, so the metric improvement is not a claim of full sentence-level
 understanding.
 
-The completed v5 isolated refinement used the v4 checkpoint as its parent and
-wrote to a new directory:
+The fixed prompt examples use seed `7`, temperature `0.7`, top-k `40`, top-p
+`0.9`, repetition penalty `1.05`, and the sentence-boundary guard. For example:
+
+```text
+Prompt: The king
+v4: The king, my Lord of Somerset, and you / Sent with him at your sister.
+v5: The king, my Lord of Somerset, and you / Sent with him at your sister.
+v6: The king hath sent to me and Ill pay the way.
+
+Prompt: To be, or not to be:
+v4: ...And now the priest could not solicit me.
+v5: ...And now the Kings incurable of his love, / And put his business to his evil tongue.
+v6: ...And now the Kings incur, when the Duke of York.
+```
+
+The complete four-prompt strings are stored in `v4_result.json`,
+`v5_result.json`, and `v6_result.json`.
+
+The completed v5 and v6 isolated refinements both used the v4 checkpoint as
+their parent and wrote to separate directories. Their Kaggle notebooks are:
+
+- [v5 notebook](https://www.kaggle.com/code/answerr5/mini-transformer-bpe-lm-expanded-optimize-v5)
+- [v6 notebook](https://www.kaggle.com/code/answerr5/mini-transformer-bpe-lm-expanded-optimize-v6)
 
 ```bash
 python scripts/train_v14.py \
@@ -218,10 +242,13 @@ python scripts/train_v14.py \
   --device cuda
 ```
 
-The v5 configuration lowers the continuation learning rate to `1e-5`, keeps the
-512-token BPE vocabulary and 4-layer/256-width model unchanged, and uses a
-separate `checkpoints/v14_bpe_expanded_optimize_v5` directory. It beat `2.350902`
-on expanded validation and is therefore the active result; v4 remains intact.
+The v5 configuration uses a `0.15` old-data replay ratio; v6 uses `0.10`. Both
+lower the continuation learning rate to `1e-5`, keep the 512-token BPE
+vocabulary and 4-layer/256-width model unchanged, and use separate
+`checkpoints/v14_bpe_expanded_optimize_v5` and
+`checkpoints/v14_bpe_expanded_optimize_v6` directories. v6 is active by the
+expanded-validation criterion; v4 and v5 remain intact. No further run is
+started after v6 until explicitly requested.
 
 ## Repository layout
 
