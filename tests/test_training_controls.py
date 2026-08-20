@@ -161,6 +161,47 @@ class TrainingControlsTest(unittest.TestCase):
             self.assertEqual(checkpoint["step"], 1)
             self.assertEqual(checkpoint["best_step"], 1)
 
+    def test_resume_accepts_serialized_generator_state_as_list(self) -> None:
+        model_config = ModelConfig(block_size=8, n_layer=1, n_head=1, n_embd=8)
+        with tempfile.TemporaryDirectory() as parent_directory, tempfile.TemporaryDirectory() as new_directory:
+            parent_config = TrainConfig(
+                batch_size=2,
+                learning_rate=0.01,
+                max_steps=1,
+                eval_interval=1,
+                eval_steps=1,
+                device="cpu",
+                checkpoint_dir=parent_directory,
+            )
+            train_model(self.dataset, self.tokenizer, model_config, parent_config)
+            parent_path = Path(parent_directory) / "best.pt"
+            checkpoint = torch.load(parent_path, map_location="cpu", weights_only=False)
+            checkpoint["train_generator_state"] = checkpoint["train_generator_state"].tolist()
+            list_parent_path = Path(parent_directory) / "list_state.pt"
+            torch.save(checkpoint, list_parent_path)
+            resume_config = TrainConfig(
+                batch_size=2,
+                learning_rate=0.001,
+                max_steps=2,
+                eval_interval=1,
+                eval_steps=1,
+                device="cpu",
+                checkpoint_dir=new_directory,
+            )
+            with patch(
+                "mini_transformer.train.estimate_loss",
+                return_value={"train": 0.5, "val": 0.5},
+            ):
+                result = train_model(
+                    self.dataset,
+                    self.tokenizer,
+                    model_config,
+                    resume_config,
+                    resume_path=list_parent_path,
+                    reset_best_on_resume=False,
+                )
+            self.assertEqual(result["step"], 2)
+
 
 if __name__ == "__main__":
     unittest.main()

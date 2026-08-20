@@ -172,7 +172,12 @@ def train_model(
             checkpoint.get("tokens_seen", start_step * old_batch_size * old_block_size)
         )
         if "train_generator_state" in checkpoint:
-            train_generator.set_state(checkpoint["train_generator_state"])
+            generator_state = checkpoint["train_generator_state"]
+            if not isinstance(generator_state, torch.Tensor):
+                generator_state = torch.tensor(generator_state, dtype=torch.uint8)
+            else:
+                generator_state = generator_state.detach().cpu().to(dtype=torch.uint8)
+            train_generator.set_state(generator_state)
         run_metadata.update(
             {
                 "parent_checkpoint": str(Path(resume_path).resolve()),
