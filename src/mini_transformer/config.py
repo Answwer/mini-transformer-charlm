@@ -68,6 +68,10 @@ class ExperimentConfig:
     tokenizer: str = "char"
     bpe_vocab_size: int = 512
     bpe_min_frequency: int = 2
+    replay_data_path: str | None = None
+    split_manifest_path: str | None = None
+    old_data_ratio: float = 0.0
+    reset_best_on_resume: bool = False
     model: ModelConfig = field(default_factory=ModelConfig)
     train: TrainConfig = field(default_factory=TrainConfig)
 
@@ -80,6 +84,10 @@ class ExperimentConfig:
             raise ValueError("bpe_vocab_size must be greater than 4")
         if self.bpe_min_frequency <= 0:
             raise ValueError("bpe_min_frequency must be positive")
+        if not 0.0 <= self.old_data_ratio < 1.0:
+            raise ValueError("old_data_ratio must be in [0, 1)")
+        if self.old_data_ratio > 0.0 and not self.replay_data_path:
+            raise ValueError("replay_data_path is required when old_data_ratio is positive")
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -88,6 +96,10 @@ class ExperimentConfig:
             "tokenizer": self.tokenizer,
             "bpe_vocab_size": self.bpe_vocab_size,
             "bpe_min_frequency": self.bpe_min_frequency,
+            "replay_data_path": self.replay_data_path,
+            "split_manifest_path": self.split_manifest_path,
+            "old_data_ratio": self.old_data_ratio,
+            "reset_best_on_resume": self.reset_best_on_resume,
             "model": asdict(self.model),
             "train": asdict(self.train),
         }
@@ -160,6 +172,18 @@ def load_config(path: str | Path) -> ExperimentConfig:
         tokenizer=str(raw.get("tokenizer", "char")),
         bpe_vocab_size=int(raw.get("bpe_vocab_size", 512)),
         bpe_min_frequency=int(raw.get("bpe_min_frequency", 2)),
+        replay_data_path=(
+            None
+            if raw.get("replay_data_path") in {None, "", "null"}
+            else str(raw["replay_data_path"])
+        ),
+        split_manifest_path=(
+            None
+            if raw.get("split_manifest_path") in {None, "", "null"}
+            else str(raw["split_manifest_path"])
+        ),
+        old_data_ratio=float(raw.get("old_data_ratio", 0.0)),
+        reset_best_on_resume=bool(raw.get("reset_best_on_resume", False)),
         model=model,
         train=train,
     )

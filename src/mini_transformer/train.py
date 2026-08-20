@@ -49,6 +49,25 @@ def estimate_loss(
     return losses
 
 
+def estimate_validation_loss(
+    model: CharTransformerLM,
+    dataset: CharDataset,
+    train_config: TrainConfig,
+    device: torch.device,
+) -> float:
+    """Evaluate one additional validation stream using fixed windows."""
+    model.eval()
+    values = []
+    with torch.no_grad():
+        for x, y in dataset.iter_evaluation_batches(
+            "val", train_config.batch_size, train_config.eval_steps, device=device
+        ):
+            _, loss = model(x, y)
+            values.append(loss.item())
+    model.train()
+    return sum(values) / len(values)
+
+
 def save_checkpoint(
     path: str | Path,
     model: CharTransformerLM,
@@ -61,8 +80,9 @@ def save_checkpoint(
     tokens_seen: int = 0,
     best_step: int = 0,
     evaluations_without_improvement: int = 0,
-    metrics: dict[str, float] | None = None,
+    metrics: dict[str, Any] | None = None,
     train_generator_state: torch.Tensor | None = None,
+    checkpoint_metadata: dict[str, Any] | None = None,
 ) -> None:
     checkpoint = {
         "model_state": model.state_dict(),
@@ -76,6 +96,7 @@ def save_checkpoint(
         "tokens_seen": tokens_seen,
         "evaluations_without_improvement": evaluations_without_improvement,
         "metrics": metrics or {},
+        "checkpoint_metadata": checkpoint_metadata or {},
         "seed": train_config.seed,
     }
     if train_generator_state is not None:
@@ -89,6 +110,9 @@ def train_model(
     model_config: ModelConfig,
     train_config: TrainConfig,
     resume_path: str | Path | None = None,
+    reset_best_on_resume: bool = False,
+    checkpoint_metadata: dict[str, Any] | None = None,
+    extra_eval_datasets: dict[str, CharDataset] | None = None,
 ) -> dict[str, Any]:
     """Train a model and save best.pt/last.pt in the configured directory.
 
@@ -107,18 +131,57 @@ def train_model(
     best_step = 0
     evaluations_without_improvement = 0
     train_generator = torch.Generator().manual_seed(train_config.seed + 1)
+    initial_tokens_seen = 0
+    run_metadata = dict(checkpoint_metadata or {})
     if resume_path is not None:
         checkpoint = torch.load(resume_path, map_location=device, weights_only=False)
+        checkpoint_model_config = ModelConfig(**checkpoint["model_config"])
+        if checkpoint_model_config != model_config:
+            raise ValueError(
+                "resume checkpoint model_config does not match the new experiment; "
+                "the model structure must remain unchanged"
+            )
+        if checkpoint.get("tokenizer") != tokenizer.state_dict():
+            raise ValueError(
+                "resume checkpoint tokenizer does not match the tokenizer used for the data"
+            )
         model.load_state_dict(checkpoint["model_state"])
         optimizer.load_state_dict(checkpoint["optimizer_state"])
+        for parameter_group in optimizer.param_groups:
+            parameter_group["lr"] = train_config.learning_rate
         start_step = int(checkpoint["step"])
-        best_val_loss = float(checkpoint["best_val_loss"])
-        best_step = int(checkpoint.get("best_step", start_step))
-        evaluations_without_improvement = int(
-            checkpoint.get("evaluations_without_improvement", 0)
+        if train_config.max_steps <= start_step:
+            raise ValueError(
+                f"max_steps ({train_config.max_steps}) must be greater than "
+                f"the resume step ({start_step})"
+            )
+        if reset_best_on_resume:
+            best_val_loss = float("inf")
+            best_step = 0
+            evaluations_without_improvement = 0
+        else:
+            best_val_loss = float(checkpoint["best_val_loss"])
+            best_step = int(checkpoint.get("best_step", start_step))
+            evaluations_without_improvement = int(
+                checkpoint.get("evaluations_without_improvement", 0)
+            )
+        old_train_config = checkpoint.get("train_config", {})
+        old_batch_size = int(old_train_config.get("batch_size", train_config.batch_size))
+        old_block_size = int(checkpoint["model_config"].get("block_size", model_config.block_size))
+        initial_tokens_seen = int(
+            checkpoint.get("tokens_seen", start_step * old_batch_size * old_block_size)
         )
         if "train_generator_state" in checkpoint:
             train_generator.set_state(checkpoint["train_generator_state"])
+        run_metadata.update(
+            {
+                "parent_checkpoint": str(Path(resume_path).resolve()),
+                "parent_step": start_step,
+                "parent_best_val_loss": float(checkpoint.get("best_val_loss", float("nan"))),
+                "best_reset_for_new_validation": reset_best_on_resume,
+                "optimizer_state_restored": True,
+            }
+        )
         print(f"Resumed from {resume_path} at step {start_step}")
 
     checkpoint_dir = ensure_directory(train_config.checkpoint_dir)
@@ -127,7 +190,7 @@ def train_model(
     print(f"config model={asdict(model_config)} train={asdict(train_config)}")
     last_metrics: dict[str, float] = {"train": float("nan"), "val": float("nan")}
     history: list[dict[str, float | int]] = []
-    tokens_seen = start_step * train_config.batch_size * model_config.block_size
+    tokens_seen = initial_tokens_seen
     completed_step = start_step
     stop_reason = "max_steps_reached"
     training_started = time.perf_counter()
@@ -154,6 +217,10 @@ def train_model(
         )
         if should_evaluate:
             last_metrics = estimate_loss(model, dataset, train_config, device)
+            for name, extra_dataset in (extra_eval_datasets or {}).items():
+                last_metrics[name] = estimate_validation_loss(
+                    model, extra_dataset, train_config, device
+                )
             improved = last_metrics["val"] < best_val_loss - train_config.early_stopping_min_delta
             if improved:
                 best_val_loss = last_metrics["val"]
@@ -192,6 +259,7 @@ def train_model(
                 evaluations_without_improvement=evaluations_without_improvement,
                 metrics=last_metrics,
                 train_generator_state=train_generator.get_state(),
+                checkpoint_metadata=run_metadata,
             )
             if improved:
                 save_checkpoint(
@@ -208,6 +276,7 @@ def train_model(
                     evaluations_without_improvement=evaluations_without_improvement,
                     metrics=last_metrics,
                     train_generator_state=train_generator.get_state(),
+                    checkpoint_metadata=run_metadata,
                 )
             if (
                 train_config.early_stopping_patience > 0

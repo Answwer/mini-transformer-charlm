@@ -139,6 +139,49 @@ verify whether a sentence is factually or semantically correct. Improving
 that requires more varied text and training capacity, or a separately tracked
 pretrained-model fine-tuning route.
 
+## Independent expanded-data continuation
+
+The expanded-data experiment is deliberately separate from `checkpoints/v14_bpe`.
+It loads the old 512-token BPE state from the parent checkpoint, keeps the old
+model dimensions and embedding rows unchanged, evaluates the new validation
+split, and writes only to `checkpoints/v14_bpe_expanded_continue`. A 30% replay
+stream from the original corpus is enabled to reduce catastrophic forgetting.
+
+The current expanded corpus is the independently prepared Gutenberg
+Shakespeare dataset at `data/expanded/dataset-expand.txt`. It was built from
+the complete works source
+`https://www.gutenberg.org/cache/epub/100/pg100.txt`, with play-only
+extraction, format normalization, work/paragraph/n-gram deduplication, and a
+work-level train/validation/test manifest. The original `dataset.txt` and the
+old v1/v14 checkpoints are not modified.
+
+To rebuild this exact corpus from the downloaded source:
+
+```bash
+python scripts/prepare_shakespeare_expanded.py \
+  --baseline C:/Users/86151/Desktop/dataset.txt \
+  --source work/download_temp/pg100.full.txt \
+  --output C:/Users/86151/Desktop/dataset-expand.txt \
+  --report C:/Users/86151/Desktop/format_report.json
+```
+
+Copy the resulting TXT and JSON to `data/expanded/` before training. Training
+itself is offline. Then resume from the real v1 `best.pt` (not the local smoke-test
+checkpoint):
+
+```bash
+python scripts/train_v14.py \
+  --config configs/v14_bpe_expanded_continue.yaml \
+  --resume /path/to/old/v14_bpe/best.pt \
+  --device cuda
+```
+
+The new checkpoints record the parent checkpoint, old/new data hashes and
+sizes, token counts, `<unk>` ratios, replay ratio, and whether best selection
+was reset for the new validation set. Use `scripts/generate_v14.py` with the
+new experiment's `best.pt` for generation; the old v1/v14 checkpoints remain
+available for fixed-prompt comparison.
+
 ## Repository layout
 
 ```text

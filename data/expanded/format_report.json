@@ -1,0 +1,459 @@
+{
+  "baseline": {
+    "path": "C:\\Users\\86151\\Desktop\\dataset.txt",
+    "utf8_bytes": 1155392,
+    "characters": 1115393,
+    "sha256": "a877ff47515162213c75d9ecbe791c0804fb716f334b4b779f16b24b150bbff0"
+  },
+  "source": {
+    "path": "work\\download_temp\\pg100.full.txt",
+    "url": "https://www.gutenberg.org/cache/epub/100/pg100.txt",
+    "utf8_bytes": 5638480,
+    "characters": 5378701,
+    "sha256": "3cf4b3d44ee14cff4e14e78e2ad3318eff76f3f7f2afc3cee6bb925879110a37",
+    "work_heading_count": 38,
+    "complete_work_count": 38,
+    "incomplete_works_discarded": []
+  },
+  "output": {
+    "path": "C:\\Users\\86151\\Desktop\\dataset-expand.txt",
+    "utf8_bytes": 5085615,
+    "characters": 5024557,
+    "lines": 178211,
+    "empty_lines": 35683,
+    "empty_line_ratio": 0.20022894209672804,
+    "speaker_lines": 30297,
+    "speaker_line_ratio": 0.17000634079826724,
+    "line_length": {
+      "mean": 27.194426831115923,
+      "median": 32,
+      "max": 77,
+      "p95": 66
+    },
+    "control_character_count": 0,
+    "control_characters": [],
+    "gutenberg_residuals": {
+      "\\*\\*\\*\\s*(?:START|END) OF": 0,
+      "PROJECT GUTENBERG": 0,
+      "www\\.gutenberg\\.org": 0,
+      "<\\/?(?:html|body|p|div|br)[^>]*>": 0
+    },
+    "duplicate_paragraphs_in_output": 0,
+    "sha256": "79edbbbd07a86f58cc14e1447c1242ed1e3f645b08bf996fd307cbcbe586d320"
+  },
+  "deduplication": {
+    "duplicate_work_count": 0,
+    "duplicate_paragraph_count": 3285,
+    "duplicate_ngram_paragraph_count": 21
+  },
+  "splits": {
+    "source": "work\\download_temp\\pg100.full.txt",
+    "output": "C:\\Users\\86151\\Desktop\\dataset-expand.txt",
+    "split_policy": {
+      "train": 0.8,
+      "validation": 0.1,
+      "test": 0.1
+    },
+    "works": {
+      "train": [
+        "A MIDSUMMER NIGHT’S DREAM",
+        "THE TRAGEDY OF ANTONY AND CLEOPATRA",
+        "THE WINTER’S TALE",
+        "THE TRAGEDY OF MACBETH",
+        "THE COMEDY OF ERRORS",
+        "THE TRAGEDY OF ROMEO AND JULIET",
+        "THE FIRST PART OF HENRY THE SIXTH",
+        "THE TWO NOBLE KINSMEN",
+        "THE LIFE AND DEATH OF KING JOHN",
+        "THE THIRD PART OF KING HENRY THE SIXTH",
+        "THE TWO GENTLEMEN OF VERONA",
+        "TWELFTH NIGHT; OR, WHAT YOU WILL",
+        "CYMBELINE",
+        "KING HENRY THE EIGHTH",
+        "ALL’S WELL THAT ENDS WELL",
+        "THE MERRY WIVES OF WINDSOR",
+        "THE TRAGEDY OF KING LEAR",
+        "THE TRAGEDY OF HAMLET, PRINCE OF DENMARK",
+        "THE SECOND PART OF KING HENRY THE FOURTH",
+        "THE FIRST PART OF KING HENRY THE FOURTH",
+        "THE SECOND PART OF KING HENRY THE SIXTH",
+        "LOVE’S LABOUR’S LOST",
+        "THE TRAGEDY OF TITUS ANDRONICUS",
+        "THE MERCHANT OF VENICE",
+        "THE TEMPEST",
+        "THE LIFE AND DEATH OF KING RICHARD THE SECOND",
+        "THE TRAGEDY OF JULIUS CAESAR",
+        "THE TAMING OF THE SHREW",
+        "MUCH ADO ABOUT NOTHING",
+        "THE TRAGEDY OF OTHELLO, THE MOOR OF VENICE"
+      ],
+      "validation": [
+        "THE LIFE OF KING HENRY THE FIFTH",
+        "TROILUS AND CRESSIDA",
+        "PERICLES, PRINCE OF TYRE"
+      ],
+      "test": [
+        "MEASURE FOR MEASURE",
+        "THE LIFE OF TIMON OF ATHENS",
+        "AS YOU LIKE IT",
+        "THE TRAGEDY OF CORIOLANUS",
+        "KING RICHARD THE THIRD"
+      ]
+    },
+    "split_paths": {},
+    "split_quality_pass": true
+  },
+  "work_records": [
+    {
+      "title": "ALL’S WELL THAT ENDS WELL",
+      "sha256": "4f63907eb284169020e071b651280f24a53e5326b79d38dfd546d50de7e49f26",
+      "split": "train",
+      "char_start": 0,
+      "char_end": 130405,
+      "characters": 130405,
+      "speaker_lines": 938
+    },
+    {
+      "title": "THE TRAGEDY OF ANTONY AND CLEOPATRA",
+      "sha256": "04bb79f493ff71fe90dec297bd95f6ba5475c46f4f41fd4a1554b95d221f4cfb",
+      "split": "train",
+      "char_start": 130407,
+      "char_end": 276290,
+      "characters": 145883,
+      "speaker_lines": 1176
+    },
+    {
+      "title": "AS YOU LIKE IT",
+      "sha256": "ed2398082c6241592e2b7450fe9fc75c413825b8af60c81bdd872c0907c90c05",
+      "split": "test",
+      "char_start": 276292,
+      "char_end": 397980,
+      "characters": 121688,
+      "speaker_lines": 810
+    },
+    {
+      "title": "THE COMEDY OF ERRORS",
+      "sha256": "0e14f366fe798d61348ccdf45e7219b4e0ba2a10512b4074afbb6c074cb64bc0",
+      "split": "train",
+      "char_start": 397982,
+      "char_end": 484522,
+      "characters": 86540,
+      "speaker_lines": 608
+    },
+    {
+      "title": "THE TRAGEDY OF CORIOLANUS",
+      "sha256": "eebf04549b5af78d9b3b19000e9b7178af0fcdc13cc7cddc2edcb8a94f66b0d0",
+      "split": "test",
+      "char_start": 484524,
+      "char_end": 638954,
+      "characters": 154430,
+      "speaker_lines": 1104
+    },
+    {
+      "title": "CYMBELINE",
+      "sha256": "41a0b89414bc3128e017223d2bea862b7ca3ef6d904a92345d34f00940aac4bc",
+      "split": "train",
+      "char_start": 638956,
+      "char_end": 794967,
+      "characters": 156011,
+      "speaker_lines": 855
+    },
+    {
+      "title": "THE TRAGEDY OF HAMLET, PRINCE OF DENMARK",
+      "sha256": "661faa993d928e9b9dd20c0dd7d1fed58930d73938ef0ec0751884db53377e32",
+      "split": "train",
+      "char_start": 794969,
+      "char_end": 968169,
+      "characters": 173200,
+      "speaker_lines": 1121
+    },
+    {
+      "title": "THE FIRST PART OF KING HENRY THE FOURTH",
+      "sha256": "6e6e331aa44a737bc545c55f1612d4ef6299b2f75506768f1e77a84e69947ed9",
+      "split": "train",
+      "char_start": 968171,
+      "char_end": 1106150,
+      "characters": 137979,
+      "speaker_lines": 775
+    },
+    {
+      "title": "THE SECOND PART OF KING HENRY THE FOURTH",
+      "sha256": "6ba6550bb858750b00cdb76a5df51d3522b2e51e74b4f08c5efdd600cb6f1c44",
+      "split": "train",
+      "char_start": 1106152,
+      "char_end": 1254144,
+      "characters": 147992,
+      "speaker_lines": 902
+    },
+    {
+      "title": "THE LIFE OF KING HENRY THE FIFTH",
+      "sha256": "c6d2859209f9ea05ffc18d9b187fd7a3bb92bf1c5b6c8a144410a366bea21aba",
+      "split": "validation",
+      "char_start": 1254146,
+      "char_end": 1401595,
+      "characters": 147449,
+      "speaker_lines": 739
+    },
+    {
+      "title": "THE FIRST PART OF HENRY THE SIXTH",
+      "sha256": "21fc12d86dee99b4fa8ccf10e55a3ed8948fe8670398968c824a67d6b6d3ca8e",
+      "split": "train",
+      "char_start": 1401597,
+      "char_end": 1528046,
+      "characters": 126449,
+      "speaker_lines": 644
+    },
+    {
+      "title": "THE SECOND PART OF KING HENRY THE SIXTH",
+      "sha256": "6f73d8f73138ad088090a58a3df91bf3f945cc9bd70ff637460d7038c584cdcc",
+      "split": "train",
+      "char_start": 1528048,
+      "char_end": 1674483,
+      "characters": 146435,
+      "speaker_lines": 768
+    },
+    {
+      "title": "THE THIRD PART OF KING HENRY THE SIXTH",
+      "sha256": "3a524f1d37902b687c6041132e2f56620bbc6f4931317f9fa67a1d12bf9288a3",
+      "split": "train",
+      "char_start": 1674485,
+      "char_end": 1808449,
+      "characters": 133964,
+      "speaker_lines": 782
+    },
+    {
+      "title": "KING HENRY THE EIGHTH",
+      "sha256": "4629309988668c897256c4796927e29e1ca15fadedd025f9b79b7cffd7598115",
+      "split": "train",
+      "char_start": 1808451,
+      "char_end": 1947687,
+      "characters": 139236,
+      "speaker_lines": 708
+    },
+    {
+      "title": "THE LIFE AND DEATH OF KING JOHN",
+      "sha256": "35ad09b6fcf03f284f32df79b98847b66ed104a6da38f06980e2a12058550781",
+      "split": "train",
+      "char_start": 1947689,
+      "char_end": 2065658,
+      "characters": 117969,
+      "speaker_lines": 549
+    },
+    {
+      "title": "THE TRAGEDY OF JULIUS CAESAR",
+      "sha256": "ab889e458bfb96a19b5de8fe90469462ef2dccefcd21877f931eea00c954394c",
+      "split": "train",
+      "char_start": 2065660,
+      "char_end": 2178504,
+      "characters": 112844,
+      "speaker_lines": 794
+    },
+    {
+      "title": "THE TRAGEDY OF KING LEAR",
+      "sha256": "5b85d09f586f6338fc082444d4d7e222de5baaceb97e61b7855107f75aef3759",
+      "split": "train",
+      "char_start": 2178506,
+      "char_end": 2328560,
+      "characters": 150054,
+      "speaker_lines": 1065
+    },
+    {
+      "title": "LOVE’S LABOUR’S LOST",
+      "sha256": "7b7cca91f95f0244eb6df634451be21c83a7446693d8bea995848c75fff15af9",
+      "split": "train",
+      "char_start": 2328562,
+      "char_end": 2453302,
+      "characters": 124740,
+      "speaker_lines": 1045
+    },
+    {
+      "title": "THE TRAGEDY OF MACBETH",
+      "sha256": "0c927da915addffce444a3df6f992a34076c97a7b4c9c940940829eb98c22d86",
+      "split": "train",
+      "char_start": 2453304,
+      "char_end": 2552821,
+      "characters": 99517,
+      "speaker_lines": 649
+    },
+    {
+      "title": "MEASURE FOR MEASURE",
+      "sha256": "e83986a3c9f40445067781e8f761794c50f71da60989393ff9815df57011aa5e",
+      "split": "test",
+      "char_start": 2552823,
+      "char_end": 2667690,
+      "characters": 114867,
+      "speaker_lines": 896
+    },
+    {
+      "title": "THE MERCHANT OF VENICE",
+      "sha256": "a209f4cfe55b787b89eef03a8c90610ee7b167ba5c38e730223dc88d702885b1",
+      "split": "train",
+      "char_start": 2667692,
+      "char_end": 2785399,
+      "characters": 117707,
+      "speaker_lines": 633
+    },
+    {
+      "title": "THE MERRY WIVES OF WINDSOR",
+      "sha256": "567effe438083f1f941a26e5cbbbfc81a6c9d45b07fbe201a1b9d78c90dc1dd9",
+      "split": "train",
+      "char_start": 2785401,
+      "char_end": 2911538,
+      "characters": 126137,
+      "speaker_lines": 969
+    },
+    {
+      "title": "A MIDSUMMER NIGHT’S DREAM",
+      "sha256": "01d0930d76d632a6790a11bd38bcff59d0591b03cebead812899fe0f0f786f89",
+      "split": "train",
+      "char_start": 2911540,
+      "char_end": 3004347,
+      "characters": 92807,
+      "speaker_lines": 489
+    },
+    {
+      "title": "MUCH ADO ABOUT NOTHING",
+      "sha256": "bf0f6f5692cbad662d7c5806697889a8f90022b266625d22e691f598a9e7ff49",
+      "split": "train",
+      "char_start": 3004349,
+      "char_end": 3124497,
+      "characters": 120148,
+      "speaker_lines": 976
+    },
+    {
+      "title": "THE TRAGEDY OF OTHELLO, THE MOOR OF VENICE",
+      "sha256": "c43c86869585212a08601090f053b45a0f7d693da6dc5b95612d6fbafe8a9d00",
+      "split": "train",
+      "char_start": 3124499,
+      "char_end": 3274673,
+      "characters": 150174,
+      "speaker_lines": 1177
+    },
+    {
+      "title": "PERICLES, PRINCE OF TYRE",
+      "sha256": "d92c650d36cad19189b22d21eeaf702ec1f51f5ee3e46f9ee17101f90a80cdd6",
+      "split": "validation",
+      "char_start": 3274675,
+      "char_end": 3380883,
+      "characters": 106208,
+      "speaker_lines": 630
+    },
+    {
+      "title": "THE LIFE AND DEATH OF KING RICHARD THE SECOND",
+      "sha256": "ab028adca9f0083e5a4ae85a2c6b099677ab472271682708917071a35db09d10",
+      "split": "train",
+      "char_start": 3380885,
+      "char_end": 3505255,
+      "characters": 124370,
+      "speaker_lines": 550
+    },
+    {
+      "title": "KING RICHARD THE THIRD",
+      "sha256": "f03bfcd7ffa2825db22b0dd7c529d49d90841be527f204db9c60ebfb6297eaab",
+      "split": "test",
+      "char_start": 3505257,
+      "char_end": 3672530,
+      "characters": 167273,
+      "speaker_lines": 1078
+    },
+    {
+      "title": "THE TRAGEDY OF ROMEO AND JULIET",
+      "sha256": "0fff0b95566f4c1d670c59e94cc475582619a35871f7358522b3a39ddd332a88",
+      "split": "train",
+      "char_start": 3672532,
+      "char_end": 3803013,
+      "characters": 130481,
+      "speaker_lines": 837
+    },
+    {
+      "title": "THE TAMING OF THE SHREW",
+      "sha256": "be8fc6c9cf85f82b5816c0a3cfbb5f61307b72832592ce862ab404fbf242e7dd",
+      "split": "train",
+      "char_start": 3803015,
+      "char_end": 3899101,
+      "characters": 96086,
+      "speaker_lines": 817
+    },
+    {
+      "title": "THE TEMPEST",
+      "sha256": "aa2d343b3649e2b6fc032f61b58572315a0adbdbd8d823518576a4229a8dc7d2",
+      "split": "train",
+      "char_start": 3899103,
+      "char_end": 3991408,
+      "characters": 92305,
+      "speaker_lines": 645
+    },
+    {
+      "title": "THE LIFE OF TIMON OF ATHENS",
+      "sha256": "eaee181d75c5df74bd6cc28b6605550edef379cabe4c356cee178edcaade5b08",
+      "split": "test",
+      "char_start": 3991410,
+      "char_end": 4099507,
+      "characters": 108097,
+      "speaker_lines": 802
+    },
+    {
+      "title": "THE TRAGEDY OF TITUS ANDRONICUS",
+      "sha256": "8fbe6f268753696b7abcc9c2b6f4a26fa0d11b9ec02de6c55a3adc23273e420a",
+      "split": "train",
+      "char_start": 4099509,
+      "char_end": 4217177,
+      "characters": 117668,
+      "speaker_lines": 565
+    },
+    {
+      "title": "TROILUS AND CRESSIDA",
+      "sha256": "c7636dbbc817bebb4e807e3b0d9a7b1cc00b7f48543d406d74dc784898fa208c",
+      "split": "validation",
+      "char_start": 4217179,
+      "char_end": 4368720,
+      "characters": 151541,
+      "speaker_lines": 1140
+    },
+    {
+      "title": "TWELFTH NIGHT; OR, WHAT YOU WILL",
+      "sha256": "3fe06bcf950bcdc6b871e55379d901d6f984b31ff2c3596644dfcf540762762d",
+      "split": "train",
+      "char_start": 4368722,
+      "char_end": 4480442,
+      "characters": 111720,
+      "speaker_lines": 921
+    },
+    {
+      "title": "THE TWO GENTLEMEN OF VERONA",
+      "sha256": "3d7e404caf621d1d00642631596658306902c6dc5a27ad4a15a4cc92a3307d11",
+      "split": "train",
+      "char_start": 4480444,
+      "char_end": 4578897,
+      "characters": 98453,
+      "speaker_lines": 858
+    },
+    {
+      "title": "THE TWO NOBLE KINSMEN",
+      "sha256": "249d6641c09c27ec0e1e1a9865078265622832a2c847f81aa47afef0fa6ab19a",
+      "split": "train",
+      "char_start": 4578899,
+      "char_end": 4715379,
+      "characters": 136480,
+      "speaker_lines": 836
+    },
+    {
+      "title": "THE WINTER’S TALE",
+      "sha256": "0bc4f90913934f3d75e25f7cad1d646ba30de9ff7529994b890017e89c46c819",
+      "split": "train",
+      "char_start": 4715381,
+      "char_end": 5024556,
+      "characters": 309175,
+      "speaker_lines": 742
+    }
+  ],
+  "quality": {
+    "source_complete": true,
+    "minimum_4_mib_pass": true,
+    "no_control_characters_pass": true,
+    "no_gutenberg_residuals_pass": true,
+    "no_duplicate_paragraphs_pass": true,
+    "format_pass": true,
+    "overall_pass": true
+  }
+}
