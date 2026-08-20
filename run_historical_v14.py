@@ -1,4 +1,4 @@
-"""Kaggle v1 launcher for the v14 BPE experiment.
+"""Historical v14 Kaggle launcher for the original BPE experiment.
 
 The launcher fetches the public GitHub snapshot only to reproduce the exact
 repository contents. The training code reads the bundled dataset and performs

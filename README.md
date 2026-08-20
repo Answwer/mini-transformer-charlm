@@ -99,24 +99,31 @@ words, punctuation, and line breaks; it is not translating the prompt or
 answering a question. It is learning the statistical continuation style of
 the training corpus.
 
-## Verified run
+## Historical v14 and current v4
 
-The v14 path was run end-to-end in Kaggle using the included corpus and no
-network download at runtime:
+The original from-scratch v14 run is preserved as a read-only historical
+reference. Its checkpoint, Kaggle notebook, and output bundle live under the
+local `work/history_v14_*` directories and are never used as the active
+training output.
 
-- Kaggle notebook: [Mini Transformer BPE LM v1](https://www.kaggle.com/code/answerr5/mini-transformer-bpe-lm-v1)
-- Hardware: Tesla P100 GPU
-- PyTorch: `2.5.1+cu124`
-- Tests in the Kaggle v1 run: `13/13 passed`; current local suite: `17/17 passed`
-- Training: `120,000` configured steps; the reported checkpoint was selected
-  by validation loss
-- Best validation loss: `2.3789`
-- Final training loss: `0.2486`
-- Final validation loss: `4.0318`
-- Best-checkpoint perplexity: `10.79`
+The active expanded-data result is v4:
 
-The validation loss rose after the best checkpoint, which is the expected
-overfitting signal. Generation therefore loads `best.pt`, not `last.pt`.
+- Kaggle notebook: [Mini Transformer BPE LM Expanded Optimize v4](https://www.kaggle.com/code/answerr5/mini-transformer-bpe-lm-expanded-optimize-v4)
+- Hardware: Tesla P100 GPU; PyTorch: `2.5.1+cu124`
+- Current local suite: `21/21 passed`
+- Best step: `60,000`; tokens seen: `245,760,000`
+- Expanded validation loss: `2.350902`; perplexity: `10.495`
+- Historical v14 validation loss: `2.3789`; perplexity: `10.79`
+- Old-corpus validation loss: `1.921622`
+- v4 best checkpoint SHA-256: `369d43e5428f8229fda84a5bcdaee9a20ad11d01ab1a6f64091aed31b9d4874b`
+
+The v4 result is the active comparison point and is kept in its own
+`work/kaggle_expanded_optimize_output_v4` directory. The historical v14
+artifacts remain available for fixed-prompt comparison and are not overwritten.
+
+The historical v14 validation loss rose after its best checkpoint, which is
+the expected overfitting signal. Both historical v14 and v4 generation load
+`best.pt`, not `last.pt`.
 
 Example generated output from the best checkpoint:
 
@@ -153,7 +160,7 @@ the complete works source
 `https://www.gutenberg.org/cache/epub/100/pg100.txt`, with play-only
 extraction, format normalization, work/paragraph/n-gram deduplication, and a
 work-level train/validation/test manifest. The original `dataset.txt` and the
-old v1/v14 checkpoints are not modified.
+historical v14 checkpoints are not modified.
 
 To rebuild this exact corpus from the downloaded source:
 
@@ -166,8 +173,8 @@ python scripts/prepare_shakespeare_expanded.py \
 ```
 
 Copy the resulting TXT and JSON to `data/expanded/` before training. Training
-itself is offline. Then resume from the real v1 `best.pt` (not the local smoke-test
-checkpoint):
+itself is offline. Then resume from the historical v14 `best.pt` (not the local
+smoke-test checkpoint):
 
 ```bash
 python scripts/train_v14.py \
@@ -179,8 +186,21 @@ python scripts/train_v14.py \
 The new checkpoints record the parent checkpoint, old/new data hashes and
 sizes, token counts, `<unk>` ratios, replay ratio, and whether best selection
 was reset for the new validation set. Use `scripts/generate_v14.py` with the
-new experiment's `best.pt` for generation; the old v1/v14 checkpoints remain
-available for fixed-prompt comparison.
+new experiment's `best.pt` for generation; the historical v14 checkpoints
+remain available for fixed-prompt comparison.
+
+## v4 comparison
+
+| Result | Expanded validation loss | PPL | Old validation loss | Best step | Tokens seen |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Historical v14 | 2.3789 | 10.79 | not measured | selected by validation | not recorded |
+| Current v4 | 2.350902 | 10.495 | 1.921622 | 60,000 | 245,760,000 |
+
+Under the same BPE family, v4 improves the expanded validation loss over the
+historical v14 result by `0.027998` and reduces perplexity by about `2.7%`.
+The generated samples still contain occasional repetition, half-lines, and
+semantic jumps, so the metric improvement is not a claim of full sentence-level
+understanding.
 
 ## Repository layout
 
