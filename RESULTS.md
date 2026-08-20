@@ -11,10 +11,11 @@ The historical v14 checkpoint and its Kaggle artifacts are preserved under
 | Historical v14 | original corpus | 2.378887 | 10.7929 | not evaluated | not evaluated | 2.378887 / 10.7929 | selected by validation | not recorded |
 | Active v4 | expanded corpus | 2.350902 | 10.495 | 2.23216 | 9.32 | 1.921622 / 6.832 | 60,000 | 245,760,000 |
 
-The v4 expanded validation loss is `0.027985` lower than the historical v14
-old-corpus validation loss. These losses are only directly comparable when the
-tokenizer and evaluation split are the same; the table keeps the corpus labels
-explicit to avoid treating a cross-corpus loss as a semantic score.
+The v4 expanded validation loss is numerically `0.027985` lower than the
+historical v14 old-corpus validation loss, but this is not a controlled
+cross-corpus comparison. Losses are directly comparable only when the tokenizer
+and evaluation split are the same; the table keeps the corpus labels explicit
+to avoid treating a cross-corpus loss as a semantic score.
 
 ## Fixed-prompt generation
 
