@@ -63,12 +63,25 @@ def generation_flags(text: str) -> dict[str, int | bool]:
     trigrams = [tuple(text.split()[index : index + 3]) for index in range(max(0, len(text.split()) - 2))]
     repeated_trigrams = len(trigrams) - len(set(trigrams))
     duplicate_lines = len(lines) - len(set(lines))
+    speaker_labels = re.findall(r"(?m)^[A-Z][A-Z '’.-]{1,}:$", text)
+    unique_speaker_labels = list(dict.fromkeys(speaker_labels))
     return {
         "sentence_terminated": bool(re.search(r"[.!?][\"')\]}]*$", text.rstrip())),
         "repeated_trigram_count": repeated_trigrams,
         "duplicate_line_count": duplicate_lines,
         "half_sentence_tail": not bool(re.search(r"[.!?:;][\"')\]}]*$", text.rstrip())),
+        "speaker_label_count": len(speaker_labels),
+        "speaker_label_switch_count": max(0, len(unique_speaker_labels) - 1),
     }
+
+
+def parse_seeds(raw: str) -> list[int]:
+    seeds = [int(value.strip()) for value in raw.split(",") if value.strip()]
+    if not seeds:
+        raise ValueError("--seeds must contain at least one integer")
+    if len(set(seeds)) != len(seeds):
+        raise ValueError("--seeds must not contain duplicates")
+    return seeds
 
 
 def main() -> None:
@@ -80,6 +93,11 @@ def main() -> None:
     parser.add_argument("--device", default="auto")
     parser.add_argument("--eval-steps", type=int, default=100)
     parser.add_argument("--seed", type=int, default=7)
+    parser.add_argument(
+        "--seeds",
+        default=None,
+        help="comma-separated fixed seeds; defaults to --seed for backward compatibility",
+    )
     parser.add_argument("--skip-generation", action="store_true")
     args = parser.parse_args()
 
@@ -112,27 +130,58 @@ def main() -> None:
     metrics["old_validation_ppl"] = math.exp(metrics["old_validation_loss"])
     generations: dict[str, dict[str, object]] = {}
     if not args.skip_generation:
+        seeds = parse_seeds(args.seeds) if args.seeds is not None else [args.seed]
         for prompt in PROMPTS:
-            generated = generate(
-                model,
-                tokenizer,
-                prompt=prompt,
-                max_new_tokens=120,
-                min_new_tokens=24,
-                temperature=0.7,
-                top_k=40,
-                top_p=0.9,
-                repetition_penalty=1.05,
-                seed=args.seed,
-                stop_on_sentence_end=True,
-            )
-            generations[prompt] = {"text": generated, "flags": generation_flags(generated)}
+            prompt_results: dict[str, object] = {}
+            for seed in seeds:
+                raw = generate(
+                    model,
+                    tokenizer,
+                    prompt=prompt,
+                    max_new_tokens=120,
+                    min_new_tokens=24,
+                    temperature=0.7,
+                    top_k=40,
+                    top_p=0.9,
+                    repetition_penalty=1.05,
+                    seed=seed,
+                    stop_on_sentence_end=False,
+                )
+                guarded = generate(
+                    model,
+                    tokenizer,
+                    prompt=prompt,
+                    max_new_tokens=120,
+                    min_new_tokens=24,
+                    temperature=0.7,
+                    top_k=40,
+                    top_p=0.9,
+                    repetition_penalty=1.05,
+                    seed=seed,
+                    stop_on_sentence_end=True,
+                )
+                prompt_results[str(seed)] = {
+                    "raw": {"text": raw, "flags": generation_flags(raw)},
+                    "guarded": {"text": guarded, "flags": generation_flags(guarded)},
+                    "guard_removed_characters": len(raw) - len(guarded),
+                }
+            generations[prompt] = prompt_results
     result = {
         "checkpoint": str(Path(args.checkpoint).resolve()),
         "step": checkpoint.get("step"),
         "best_step": checkpoint.get("best_step"),
         "tokens_seen": checkpoint.get("tokens_seen"),
         "parameters": sum(parameter.numel() for parameter in model.parameters()),
+        "generation_protocol": {
+            "prompts": PROMPTS,
+            "seeds": parse_seeds(args.seeds) if args.seeds is not None else [args.seed],
+            "temperature": 0.7,
+            "top_k": 40,
+            "top_p": 0.9,
+            "repetition_penalty": 1.05,
+            "min_new_tokens": 24,
+            "max_new_tokens": 120,
+        },
         "metrics": metrics,
         "generations": generations,
     }
