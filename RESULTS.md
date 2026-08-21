@@ -1,10 +1,12 @@
-# Historical v14, v4/v5 baselines, and active v6
+# Historical v14, v4/v5/v6 baselines, and active v5
 
 The historical v14 checkpoint and its Kaggle artifacts are preserved under
 `work/history_v14_*`. v4 remains an immutable baseline under
 `work/kaggle_expanded_optimize_output_v4`; v5 is preserved in
-`work/kaggle_v5_output`; the current active result is v6 in
-`work/kaggle_v6_output`. No checkpoint directory is shared.
+`work/kaggle_v5_output`; v6 remains an independent comparison in
+`work/kaggle_v6_output`; v8 is an independent continuation attempt in
+`work/kaggle_v8_output`. The current active result is v5. No checkpoint
+directory is shared.
 
 ## Fixed metrics
 
@@ -13,7 +15,8 @@ The historical v14 checkpoint and its Kaggle artifacts are preserved under
 | Historical v14 | original corpus | 2.378887 | 10.7929 | not evaluated | not evaluated | 2.378887 / 10.7929 | selected by validation | not recorded |
 | Baseline v4 | expanded corpus | 2.350902 | 10.495 | 2.23216 | 9.32 | 1.921622 / 6.832 | 60,000 | 245,760,000 |
 | Active v5 | expanded corpus | 2.347299 | 10.457 | 1.99964 | 7.386 | 1.913685 / 6.778 | 64,000 | 262,144,000 |
-| Active v6 | expanded corpus | 2.344260 | 10.426 | 2.00347 | 7.415 | 1.906484 / 6.729 | 80,000 | 327,680,000 |
+| Independent v6 | expanded corpus | 2.344260 | 10.426 | 2.00347 | 7.415 | 1.906484 / 6.729 | 80,000 | 327,680,000 |
+| v8 continuation (no improvement) | expanded corpus | 2.347299 | 10.457 | 1.99964 | 7.386 | 1.913685 / 6.778 | 64,000 | 262,144,000 |
 
 The v6 expanded validation loss is the best of the three active-family runs:
 `0.006643` lower than v4 and `0.003039` lower than v5. Its old-corpus
@@ -37,7 +40,10 @@ blank lines and a compressed `To be` continuation. All three still make
 semantic jumps and none establishes full semantic understanding. Historical v14
 has one visibly truncated prompt sample and more local continuation drift.
 
-The primary selection criterion is expanded validation loss, so v6 is now the
-active checkpoint. v4 and v5 remain reproducible comparison baselines with
-independent checkpoints, notebooks, and output directories. Per the requested
-pause condition, no further optimization run is being started after v6.
+The active result remains v5 because it has the best expanded test loss/PPL and
+the best overall balance with fixed-prompt generation. v6 has slightly lower
+validation losses but a slightly worse expanded test result and less stable raw
+generation in the v7 multi-seed diagnostic. v8 was a separate continuation from
+v5 with old-data replay 0.20 and learning rate 5e-6; it early-stopped without
+beating v5, so its best checkpoint is retained only as a negative comparison.
+All versions have independent checkpoints, notebooks, and output directories.
