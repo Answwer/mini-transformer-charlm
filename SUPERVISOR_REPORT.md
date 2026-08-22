@@ -115,6 +115,8 @@ v5 Notebook 日志确认 parent hash、数据 hash、21/21 测试通过、P100�
 
 ## 7. GitHub 交付状态
 
+主仓库仅包含 v5 的可复现代码和必要数据；v1/v14、v4、v6、v8、v9 不再以代码入口形式发布，只通过结果 JSON、对比表和报告呈现。历史 Notebook、checkpoint 和独立输出仍按版本保留。
+
 - 主仓库：Answwer/mini-transformer-charlm；
 - 独立 v9 仓库：Answwer/mini-transformer-bpe1024-dev-v9；
 - v5 主仓库包含 README、RESULTS 和本报告；

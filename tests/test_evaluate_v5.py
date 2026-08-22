@@ -3,10 +3,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.evaluate_v14 import generation_flags, parse_seeds, split_texts
+from scripts.evaluate_v5 import generation_flags, parse_seeds, split_texts
 
 
-class EvaluateV14Test(unittest.TestCase):
+class EvaluateV5Test(unittest.TestCase):
     def test_generation_flags_identify_half_sentence_and_speaker_switch(self) -> None:
         flags = generation_flags("HAMLET:\nTo be.\nOPHELIA:\nWith a broken")
         self.assertTrue(flags["half_sentence_tail"])

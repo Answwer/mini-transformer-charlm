@@ -1,4 +1,4 @@
-"""Evaluate a v14/v4 BPE checkpoint on fixed expanded, test, and old splits."""
+"""Evaluate the v5 BPE checkpoint on fixed expanded, test, and old splits."""
 
 from __future__ import annotations
 

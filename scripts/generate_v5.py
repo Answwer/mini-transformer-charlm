@@ -17,8 +17,8 @@ from mini_transformer.utils import resolve_device  # noqa: E402
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate text from a v14 BPE checkpoint.")
-    parser.add_argument("--checkpoint", default=str(ROOT / "checkpoints" / "v14_bpe" / "best.pt"))
+    parser = argparse.ArgumentParser(description="Generate text from a v5 BPE checkpoint.")
+    parser.add_argument("--checkpoint", default=str(ROOT / "checkpoints" / "v14_bpe_expanded_optimize_v5" / "best.pt"))
     parser.add_argument("--prompt", default="To be, or not to be:")
     parser.add_argument("--max-new-tokens", type=int, default=96)
     parser.add_argument(

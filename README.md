@@ -25,6 +25,8 @@
 - 完整指标：[RESULTS.md](RESULTS.md)
 - 独立 v9 对照仓库：[mini-transformer-bpe1024-dev-v9](https://github.com/Answwer/mini-transformer-bpe1024-dev-v9)
 
+GitHub 主仓库只保留 v5 的可复现代码。v1/v14、v4、v6、v8、v9 的代码入口不作为主仓库交付内容；它们仅以结果 JSON、对比表和报告形式保留。
+
 ## v5 做了什么
 
 v5 使用扩容后的完整 Shakespeare 作品数据，并从 v4 best.pt 继续训练：
@@ -79,7 +81,7 @@ v6 的 validation 略低，但 test 略高于 v5；v8 没有产生优于 v5 的 
 环境要求：Python 3.10+、PyTorch 2.x。项目不在运行时下载数据。
 
     python -m unittest discover -s tests -t . -v
-    python scripts/train_v14.py --config configs/v5_bpe_expanded_optimize.yaml --resume C:\path\to\v4\best.pt --device cuda
+    python scripts/train_v5.py --config configs/v5_bpe_expanded_optimize.yaml --resume C:\path\to\v4\best.pt --device cuda
 
 正式评估必须使用 best.pt，不要用训练结束时的 last.pt 代替。v5 的本地输出目录为 work/kaggle_v5_output，历史副本为 work/history_v5_preserved。
 

@@ -18,8 +18,8 @@ from mini_transformer.train import train_model  # noqa: E402
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Train the v14 BPE Transformer.")
-    parser.add_argument("--config", default=str(ROOT / "configs" / "v14_bpe.yaml"))
+    parser = argparse.ArgumentParser(description="Train the v5 BPE Transformer.")
+    parser.add_argument("--config", default=str(ROOT / "configs" / "v5_bpe_expanded_optimize.yaml"))
     parser.add_argument("--max-steps", type=int, default=None)
     parser.add_argument("--device", default=None)
     parser.add_argument("--resume", default=None)
@@ -34,7 +34,7 @@ def main() -> None:
 
     config = load_config(args.config)
     if config.tokenizer != "bpe":
-        raise ValueError("train_v14.py requires tokenizer: bpe")
+        raise ValueError("train_v5.py requires tokenizer: bpe")
     if args.max_steps is not None:
         config.train.max_steps = args.max_steps
     if args.device is not None:
@@ -182,7 +182,7 @@ def main() -> None:
             "use a new checkpoint_dir"
         )
     metadata: dict[str, object] = {
-        "experiment": "v14_bpe_expanded_continue" if resume_path else "v14_bpe",
+        "experiment": "v5_bpe_expanded_optimize",
         "tokenizer_source": tokenizer_source,
         "tokenizer_vocab_size": tokenizer.vocab_size,
         "data": data_metadata(data_path, text, tokenizer),
