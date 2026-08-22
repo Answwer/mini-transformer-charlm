@@ -37,7 +37,12 @@ def split_texts(report_path: Path, text: str) -> dict[str, str]:
     records = report.get("work_records", [])
     if not records:
         raise ValueError("format report has no work_records")
-    groups: dict[str, list[str]] = {"train": [], "validation": [], "test": []}
+    groups: dict[str, list[str]] = {
+        "train": [],
+        "validation": [],
+        "test": [],
+        "development_validation": [],
+    }
     for record in records:
         split = str(record.get("split", ""))
         if split not in groups:
@@ -56,6 +61,14 @@ def split_loss(
 ) -> float:
     dataset = CharDataset.from_split_texts(text, text, tokenizer, block_size)
     return estimate_validation_loss(model, dataset, train_config, device)
+
+
+def bits_per_byte(loss: float, text: str, tokenizer: BPETokenizer) -> float:
+    token_count = len(tokenizer.encode(text))
+    byte_count = len(text.encode("utf-8"))
+    if token_count == 0 or byte_count == 0:
+        return float("nan")
+    return loss * token_count / byte_count / math.log(2.0)
 
 
 def generation_flags(text: str) -> dict[str, int | bool]:
@@ -89,6 +102,11 @@ def main() -> None:
     parser.add_argument("--checkpoint", required=True)
     parser.add_argument("--expanded", default=str(ROOT / "data/expanded/dataset-expand.txt"))
     parser.add_argument("--report", default=str(ROOT / "data/expanded/format_report.json"))
+    parser.add_argument(
+        "--development-manifest",
+        default=None,
+        help="optional derived manifest containing a development_validation split",
+    )
     parser.add_argument("--old-data", default=str(ROOT / "data/tiny_shakespeare.txt"))
     parser.add_argument("--device", default="auto")
     parser.add_argument("--eval-steps", type=int, default=100)
@@ -114,6 +132,13 @@ def main() -> None:
         max_steps=1,
     )
     expanded = split_texts(Path(args.report), Path(args.expanded).read_text(encoding="utf-8"))
+    if args.development_manifest:
+        development = split_texts(
+            Path(args.development_manifest), Path(args.expanded).read_text(encoding="utf-8")
+        )
+        if "development_validation" not in development:
+            raise ValueError("development manifest has no development_validation split")
+        expanded["development_validation"] = development["development_validation"]
     old_text = Path(args.old_data).read_text(encoding="utf-8")
     metrics = {
         "expanded_validation_loss": split_loss(model, expanded["validation"], tokenizer, model_config.block_size, train_config, device),
@@ -125,9 +150,33 @@ def main() -> None:
             device,
         ),
     }
+    if "development_validation" in expanded:
+        metrics["development_validation_loss"] = split_loss(
+            model,
+            expanded["development_validation"],
+            tokenizer,
+            model_config.block_size,
+            train_config,
+            device,
+        )
     metrics["expanded_validation_ppl"] = math.exp(metrics["expanded_validation_loss"])
     metrics["expanded_test_ppl"] = math.exp(metrics["expanded_test_loss"])
     metrics["old_validation_ppl"] = math.exp(metrics["old_validation_loss"])
+    metrics["expanded_validation_bpb"] = bits_per_byte(
+        metrics["expanded_validation_loss"], expanded["validation"], tokenizer
+    )
+    metrics["expanded_test_bpb"] = bits_per_byte(
+        metrics["expanded_test_loss"], expanded["test"], tokenizer
+    )
+    if "development_validation_loss" in metrics:
+        metrics["development_validation_ppl"] = math.exp(
+            metrics["development_validation_loss"]
+        )
+        metrics["development_validation_bpb"] = bits_per_byte(
+            metrics["development_validation_loss"],
+            expanded["development_validation"],
+            tokenizer,
+        )
     generations: dict[str, dict[str, object]] = {}
     if not args.skip_generation:
         seeds = parse_seeds(args.seeds) if args.seeds is not None else [args.seed]

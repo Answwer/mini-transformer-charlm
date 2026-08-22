@@ -1,385 +1,88 @@
-# Mini Transformer Language Model
+# Mini Transformer：v5 正式训练结果
 
-This repository contains two small, self-contained causal language-model
-paths built from PyTorch primitives: v13 character-level training for a clear
-baseline, and v14 BPE training for better word boundaries and local text
-coherence. Both paths train on the included tiny Shakespeare corpus, evaluate
-on a held-out suffix, save reproducible checkpoints, and generate new text.
+这是一个从零实现的、可复现的小型 Shakespeare 风格英文因果语言模型。模型逐个预测下一个 BPE token，再根据预测结果生成续写文本。它是教学和实验项目，不是问答模型，也不使用预训练权重。
 
-The code is intentionally explicit: the data windows, causal mask, Q/K/V
-projections, attention weights, next-token loss, training loop, and sampling
-logic are all easy to inspect. It does not download a dataset at runtime and
-does not use a pretrained model.
+## 一眼结论
 
-## Requirements
+**v5 是当前正式活动结果。** 它从 v4 的 best.pt 继续训练，保持 512 BPE、4 层 Transformer 和原模型结构不变；在扩容测试集上取得当前最佳结果。v1/v14、v4、v6、v8 和 v9 均作为独立历史或对照保留。
 
-- Python 3.10 or newer
-- PyTorch 2.x (CPU is sufficient; CUDA is used automatically when available)
-
-The project metadata intentionally does not install runtime dependencies for
-you. Install a PyTorch build appropriate for your machine by following the
-official [PyTorch installation selector](https://pytorch.org/get-started/locally/).
-For a CPU-only environment, a typical command is:
-
-```bash
-python -m pip install torch
-```
-
-The source tree is runnable without an editable install because the scripts
-add `src/` to `sys.path`. An editable install is optional:
-
-```bash
-python -m pip install -e .
-```
-
-## Quick start
-
-Run the batch inspection first:
-
-```bash
-python scripts/inspect_batch.py --config configs/tiny.yaml
-```
-
-Run a short CPU smoke training:
-
-```bash
-python scripts/train.py --config configs/tiny.yaml --device cpu --max-steps 200
-```
-
-The normal tiny configuration uses 1,000 steps. It writes only local
-artifacts to `checkpoints/`; `.pt` files are ignored by Git.
-
-Generate from the best checkpoint:
-
-```bash
-python scripts/generate.py \
-  --checkpoint checkpoints/best.pt \
-  --prompt "The " \
-  --max-new-tokens 120 \
-  --temperature 0.8 \
-  --top-k 20 \
-  --seed 7 \
-  --device cpu
-```
-
-Greedy decoding is selected with `--temperature 0`; sampling is selected by
-using a positive temperature. `--top-k` may be omitted to sample from the
-full vocabulary.
-
-## v14 BPE experiment
-
-The original v13 character-level path remains unchanged. The v14 path adds a
-dependency-free BPE tokenizer and a larger small Transformer while reusing the
-same attention, masking, dataset-window, checkpoint, and test code:
-
-```bash
-python scripts/train_v14.py --config configs/v14_bpe.yaml --device cuda
-python scripts/generate_v14.py \
-  --checkpoint checkpoints/v14_bpe/best.pt \
-  --prompt "To be, or not to be:" \
-  --max-new-tokens 96 --min-new-tokens 24 \
-  --temperature 0.7 --top-k 40 --top-p 0.9 --seed 7
-```
-
-The v14 checkpoint uses the current bundled Shakespeare dataset. It is an
-educational from-scratch model: BPE improves word boundaries and local
-coherence, but it does not guarantee that every generated sentence has
-complete semantics. The default v14 configuration also uses validation-based
-early stopping, so the final training step is not automatically treated as
-the best model.
-
-Both generation CLIs default to `best.pt` and refuse `last.pt` unless
-`--allow-last` is explicitly supplied for an overfitting comparison.
-The v14 CLI also stops at terminal punctuation after a minimum continuation
-length, so the displayed result is less likely to end in a half sentence.
-
-For example, the input prompt `To be, or not to be:` is extended by predicting
-one BPE token at a time. A successful run can produce speaker labels, whole
-words, punctuation, and line breaks; it is not translating the prompt or
-answering a question. It is learning the statistical continuation style of
-the training corpus.
-
-## Historical v14, v4/v5 baselines, and current v6
-
-The original from-scratch v14 run is preserved as a read-only historical
-reference. Its checkpoint, Kaggle notebook, and output bundle live under the
-local `work/history_v14_*` directories and are never used as the active
-training output.
-
-The active expanded-data result is v6, selected by expanded validation loss
-after two independent continuations from the immutable v4 checkpoint:
-
-- Kaggle notebook: [Mini Transformer BPE LM Expanded Optimize v6](https://www.kaggle.com/code/answerr5/mini-transformer-bpe-lm-expanded-optimize-v6)
-- Hardware: Tesla P100 GPU; PyTorch: `2.5.1+cu124`
-- Current local suite: `21/21 passed`
-- Best step: `80,000`; tokens seen: `327,680,000`
-- Expanded validation loss: `2.344260`; perplexity: `10.426`
-- Expanded test loss: `2.003474`; perplexity: `7.415`
-- Historical v14 validation loss: `2.3789`; perplexity: `10.79`
-- Old-corpus validation loss: `1.906484`; perplexity: `6.729`
-- v6 best checkpoint SHA-256: `3e01a1df97b1498c1ce5899397f9aea2dc3ecd8ad6b6921e7d6e4d6b3b3033cd`
-
-The v4 result remains an immutable comparison baseline in its own
-`work/kaggle_expanded_optimize_output_v4` directory. The v5 and v6 results are
-stored in the separate `work/kaggle_v5_output` and `work/kaggle_v6_output`
-directories. Historical v14 artifacts remain available for fixed-prompt
-comparison and are not overwritten.
-
-The historical v14 validation loss rose after its best checkpoint, which is
-the expected overfitting signal. Historical v14, v4, v5, and v6 generation load
-`best.pt`, not `last.pt`.
-
-Example generated output from the best checkpoint:
-
-```text
-To be, or not to be:
-And now, I am a fellow, if I am not of you.
-
-DUKE OF YORK:
-Why, I know the title of the king before him,
-And send it against the pattern of the battlements,
-Should not be full of sorrow to the foe.
-```
-
-This is still a deliberately small from-scratch model. The output is more
-readable than the v13 character baseline, but it is not a guarantee of
-complete sentence-level semantics.
-
-The sentence boundary guard only removes avoidable truncation. It cannot
-verify whether a sentence is factually or semantically correct. Improving
-that requires more varied text and training capacity, or a separately tracked
-pretrained-model fine-tuning route.
-
-## Independent expanded-data continuation
-
-The expanded-data experiment is deliberately separate from `checkpoints/v14_bpe`.
-It loads the old 512-token BPE state from the parent checkpoint, keeps the old
-model dimensions and embedding rows unchanged, evaluates the new validation
-split, and writes only to `checkpoints/v14_bpe_expanded_continue`. A 30% replay
-stream from the original corpus is enabled to reduce catastrophic forgetting.
-
-The current expanded corpus is the independently prepared Gutenberg
-Shakespeare dataset at `data/expanded/dataset-expand.txt`. It was built from
-the complete works source
-`https://www.gutenberg.org/cache/epub/100/pg100.txt`, with play-only
-extraction, format normalization, work/paragraph/n-gram deduplication, and a
-work-level train/validation/test manifest. The original `dataset.txt` and the
-historical v14 checkpoints are not modified.
-
-To rebuild this exact corpus from the downloaded source:
-
-```bash
-python scripts/prepare_shakespeare_expanded.py \
-  --baseline C:/Users/86151/Desktop/dataset.txt \
-  --source work/download_temp/pg100.full.txt \
-  --output C:/Users/86151/Desktop/dataset-expand.txt \
-  --report C:/Users/86151/Desktop/format_report.json
-```
-
-Copy the resulting TXT and JSON to `data/expanded/` before training. Training
-itself is offline. Then resume from the historical v14 `best.pt` (not the local
-smoke-test checkpoint):
-
-```bash
-python scripts/train_v14.py \
-  --config configs/v14_bpe_expanded_continue.yaml \
-  --resume /path/to/old/v14_bpe/best.pt \
-  --device cuda
-```
-
-The new checkpoints record the parent checkpoint, old/new data hashes and
-sizes, token counts, `<unk>` ratios, replay ratio, and whether best selection
-was reset for the new validation set. Use `scripts/generate_v14.py` with the
-new experiment's `best.pt` for generation; the historical v14 checkpoints
-remain available for fixed-prompt comparison.
-
-## v4, v5, and v6 comparison
-
-| Result | Expanded val loss / PPL | Expanded test loss / PPL | Old val loss / PPL | Best step | Tokens seen |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| Historical v14 | 2.3789 / 10.79 | not measured | not measured | selected by validation | not recorded |
-| Baseline v4 | 2.350902 / 10.495 | 2.232163 / 9.320 | 1.921622 / 6.832 | 60,000 | 245,760,000 |
-| Baseline v5 | 2.347299 / 10.457 | 1.999644 / 7.386 | 1.913685 / 6.778 | 64,000 | 262,144,000 |
-| Current v6 | 2.344260 / 10.426 | 2.003474 / 7.415 | 1.906484 / 6.729 | 80,000 | 327,680,000 |
-
-Under the same BPE family, v6 improves expanded validation loss over v4 by
-`0.006643` and over v5 by `0.003039`; old-corpus validation is also lowest at
-`1.906484`. v5 remains slightly better on expanded test PPL (`7.386` versus
-v6's `7.415`). These are next-token metrics, not a claim of full sentence-level
-understanding.
-The generated samples still contain occasional repetition, half-lines, and
-semantic jumps, so the metric improvement is not a claim of full sentence-level
-understanding.
-
-The fixed prompt examples use seed `7`, temperature `0.7`, top-k `40`, top-p
-`0.9`, repetition penalty `1.05`, and the sentence-boundary guard. For example:
-
-```text
-Prompt: The king
-v4: The king, my Lord of Somerset, and you / Sent with him at your sister.
-v5: The king, my Lord of Somerset, and you / Sent with him at your sister.
-v6: The king hath sent to me and Ill pay the way.
-
-Prompt: To be, or not to be:
-v4: ...And now the priest could not solicit me.
-v5: ...And now the Kings incurable of his love, / And put his business to his evil tongue.
-v6: ...And now the Kings incur, when the Duke of York.
-```
-
-The complete four-prompt strings are stored in `v4_result.json`,
-`v5_result.json`, and `v6_result.json`.
-
-The completed v5 and v6 isolated refinements both used the v4 checkpoint as
-their parent and wrote to separate directories. Their Kaggle notebooks are:
-
-- [v5 notebook](https://www.kaggle.com/code/answerr5/mini-transformer-bpe-lm-expanded-optimize-v5)
-- [v6 notebook](https://www.kaggle.com/code/answerr5/mini-transformer-bpe-lm-expanded-optimize-v6)
-
-```bash
-python scripts/train_v14.py \
-  --config configs/v5_bpe_expanded_optimize.yaml \
-  --resume /path/to/v4/best.pt \
-  --device cuda
-```
-
-The v5 configuration uses a `0.15` old-data replay ratio; v6 uses `0.10`. Both
-lower the continuation learning rate to `1e-5`, keep the 512-token BPE
-vocabulary and 4-layer/256-width model unchanged, and use separate
-`checkpoints/v14_bpe_expanded_optimize_v5` and
-`checkpoints/v14_bpe_expanded_optimize_v6` directories. v6 is active by the
-expanded-validation criterion; v4 and v5 remain intact. No further run is
-started after v6 until explicitly requested.
-
-## Repository layout
-
-```text
-mini-transformer-charlm/
-├── README.md
-├── LICENSE
-├── pyproject.toml
-├── .gitignore
-├── configs/tiny.yaml
-├── data/
-│   ├── tiny_shakespeare.txt
-│   └── DATASET.md
-├── src/mini_transformer/
-│   ├── config.py       # dataclasses and dependency-free config reader
-│   ├── tokenizer.py    # deterministic character vocabulary
-│   ├── dataset.py      # contiguous 90/10 split and sliding windows
-│   ├── masking.py      # boolean causal mask and scaled attention
-│   ├── attention.py    # multi-head CausalSelfAttention
-│   ├── model.py        # positional encoding, blocks, and LM head
-│   ├── train.py        # AdamW loop, evaluation, and checkpoints
-│   ├── generate.py     # autoregressive decoding
-│   └── utils.py
-├── scripts/
-│   ├── train.py
-│   ├── generate.py
-│   └── inspect_batch.py
-├── tests/
-└── checkpoints/.gitkeep
-```
-
-## Data flow and tensor shapes
-
-The v13 tokenizer maps every character to one id. The v14 tokenizer maps
-characters and learned subword pieces to ids. Both keep the four reserved ids
-stable: `<pad>=0`, `<bos>=1`, `<eos>=2`, and `<unk>=3`.
-
-The encoded stream is split without shuffling: the first 90% is train and the
-final 10% is validation. For each sampled offset `i`, the dataset returns:
-
-```text
-x = ids[i : i + T]       # [T]
-y = ids[i + 1 : i + T + 1] # [T]
-```
-
-After batching, both are `[B, T]`. For v13 `T` counts characters; for v14 `T`
-counts BPE tokens. The model looks up token embeddings and
-adds sinusoidal positions, producing `[B, T, C]`. Each attention layer splits
-this into `[B, H, T, D]`, computes scores `[B, H, T, T]`, masks all future
-positions, and merges heads back to `[B, T, C]`. The final vocabulary
-projection returns logits `[B, T, V]`; cross entropy compares each logit at
-position `t` with the target character at position `t` (which is the next
-character relative to the original stream).
-
-The Transformer blocks use Pre-LayerNorm residual connections:
-
-```text
-x = x + Attention(LayerNorm(x))
-x = x + FFN(LayerNorm(x))
-```
-
-This is a deliberate small-model stability choice. It differs from the
-Post-LN ordering in the original Transformer paper, where normalization is
-placed after each residual addition. The FFN uses ReLU to keep the reference
-implementation close to that paper; changing it to GELU is a modern variant,
-not an accidental implementation detail.
-
-## Default configuration
-
-| Setting | Value |
+| 指标 | v5 结果 |
 | --- | ---: |
-| block size | 128 |
-| layers | 2 |
-| attention heads | 4 |
-| embedding width | 128 |
-| dropout | 0.0 |
-| batch size | 32 |
-| learning rate | 3e-4 |
-| training steps | 1,000 |
-| early stopping | disabled in `tiny.yaml`; enabled in v14 |
+| Expanded validation loss / PPL | **2.347299 / 10.457** |
+| Expanded test loss / PPL | **1.999644 / 7.386** |
+| Old validation loss / PPL | **1.913685 / 6.778** |
+| Best step | **64,000** |
+| Tokens seen | **262.144M** |
+| 参数量 | **3,422,208** |
+| Kaggle 状态 | **COMPLETE** |
+| v5 best.pt SHA-256 | 256775abb523fea7d663908431272aba8aaaf0a43f335eb382d4020459f42b2a |
 
-The implementation asserts that `n_embd % n_head == 0` and checks sequence
-lengths before attention. `--debug-shapes` is not needed because
-`inspect_batch.py` exposes the data boundary and the model tests cover the
-remaining shapes; keeping forward passes free of print statements makes the
-training log readable.
+## 直接查看
 
-## Checkpoints and reproducibility
+- v5 Kaggle Notebook：[Mini Transformer BPE LM Expanded Optimize v5](https://www.kaggle.com/code/answerr5/mini-transformer-bpe-lm-expanded-optimize-v5)
+- v5 训练代码仓库：[mini-transformer-charlm](https://github.com/Answwer/mini-transformer-charlm)
+- 可交付报告：[SUPERVISOR_REPORT.md](SUPERVISOR_REPORT.md)
+- 完整指标：[RESULTS.md](RESULTS.md)
+- 独立 v9 对照仓库：[mini-transformer-bpe1024-dev-v9](https://github.com/Answwer/mini-transformer-bpe1024-dev-v9)
 
-`best.pt` and `last.pt` contain model and optimizer state, model/training
-configuration, tokenizer vocabulary, current step, best validation loss,
-best step, tokens seen, early-stopping counters, and the seed. Loading uses
-`map_location`, so a CPU machine can load a checkpoint created on CUDA.
-Training seeds Python and PyTorch; training batches use a dedicated seeded
-generator, while validation uses a fixed evenly spaced set of windows so
-checkpoint comparisons are stable.
+## v5 做了什么
 
-Resume a run with:
+v5 使用扩容后的完整 Shakespeare 作品数据，并从 v4 best.pt 继续训练：
 
-```bash
-python scripts/train.py --config configs/tiny.yaml \
-  --device cpu --resume checkpoints/last.pt
-```
+- tokenizer：512 BPE；
+- 模型：4 层、8 个 attention heads、256 维 embedding、256 token 上下文；
+- 参数量：3,422,208；
+- batch size：16；
+- continuation learning rate：1e-5；
+- 原始数据 replay：15%，用于降低遗忘；
+- optimizer：AdamW，恢复 v4 checkpoint 的 optimizer state；
+- early stopping：以 expanded validation loss 选择 best.pt。
 
-## Tests and debugging order
+v5 不是随机初始化，也不是重新学习 tokenizer；它是同一 512 BPE 体系下从 v4 继续训练的独立实验。
 
-Run all tests with the standard library test runner:
+## 数据
 
-```bash
-python -m unittest discover -s tests -t . -v
-```
+扩容数据文件为 C:\Users\86151\Desktop\dataset-expand.txt，由完整作品重建、格式归一化、作品/段落/n-gram 去重后得到。记录值：
 
-If `pytest` is already installed, the same files can also be collected with:
+- UTF-8 bytes：5,085,615；
+- characters：5,024,557；
+- SHA-256：79edbbbd07a86f58cc14e1447c1242ed1e3f645b08bf996fd307cbcbe586d320；
+- official train/validation/test：30/3/5 部作品。
 
-```bash
-python -m pytest -q
-```
+原始 dataset.txt 从未被修改。训练、验证和测试按作品切分，official test 只在最终评估使用。
 
-The tiny overfit test is the most useful first diagnostic. If it fails,
-inspect the right-shifted targets, the upper-triangular causal mask, the
-`[B, H, T, D]` reshape, the logits/targets flattening, the learning rate, and
-whether the model is in training mode—in that order.
+## 版本对比
 
-## Known limitations and next steps
+| 版本 | 说明 | Expanded val loss | Expanded test loss | Old val loss | Best step |
+| --- | --- | ---: | ---: | ---: | ---: |
+| 历史 v1/v14 | 原始语料历史基线 | 不适用 | 未测 | 2.378887 | 历史最佳点 |
+| v4 | 扩容数据 512 BPE 基线 | 2.350902 | 2.232163 | 1.921622 | 60,000 |
+| **v5** | **从 v4 续训，replay=0.15** | **2.347299** | **1.999644** | 1.913685 | **64,000** |
+| v6 | 从 v4 独立续训，replay=0.10 | 2.344260 | 2.003474 | **1.906484** | 80,000 |
+| v8 | 从 v5 续训，未超过 v5 | 2.347299 | 1.999644 | 1.913685 | 64,000 |
+| v9 | 独立 1024 BPE，从零训练 | 2.663134 | 2.452331 | 2.482651 | 22,000 |
 
-- The v13 tokenizer is character-level, so its sequences are longer than v14
-  BPE or SentencePiece sequences.
-- The v14 BPE tokenizer is intentionally compact and educational; it is not a
-  drop-in replacement for a production tokenizer.
-- Generation recomputes the entire context at every step and has no KV cache;
-  this is intentionally straightforward and is not production optimized.
-- The project is a teaching/reference implementation, not a production LM.
-- Future extensions could add SentencePiece, Hugging Face `datasets`,
-  `accelerate`, mixed precision, benchmark tooling, and PEFT/LoRA adapters.
+v6 的 validation 略低，但 test 略高于 v5；v8 没有产生优于 v5 的 checkpoint；v9 训练 token 数明显不足。综合 validation、test 和固定 prompt 稳定性，v5 作为正式结果。
+
+## 生成能力边界
+
+固定 prompt 示例：
+
+    Prompt: The king
+    v5: The king, my Lord of Somerset, and you
+        Sent with him at your sister.
+
+模型可以生成较合理的词边界、标点和舞台文本格式，但仍可能混合角色、作品和场景。sentence-boundary guard 只能减少截断，不能证明完整语义理解。
+
+## 复现 v5
+
+环境要求：Python 3.10+、PyTorch 2.x。项目不在运行时下载数据。
+
+    python -m unittest discover -s tests -t . -v
+    python scripts/train_v14.py --config configs/v5_bpe_expanded_optimize.yaml --resume C:\path\to\v4\best.pt --device cuda
+
+正式评估必须使用 best.pt，不要用训练结束时的 last.pt 代替。v5 的本地输出目录为 work/kaggle_v5_output，历史副本为 work/history_v5_preserved。
+
+## 历史保留规则
+
+所有版本的 Notebook、checkpoint、结果 JSON 和输出目录均独立保存。任何后续 v10 或其他实验都必须使用新的 Notebook、新的输出目录和新的 checkpoint，不得覆盖 v5。

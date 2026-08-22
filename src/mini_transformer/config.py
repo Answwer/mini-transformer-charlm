@@ -43,6 +43,8 @@ class TrainConfig:
     seed: int = 1337
     device: str = "auto"
     checkpoint_dir: str = "checkpoints"
+    selection_extra_metric: str | None = None
+    selection_extra_weight: float = 0.0
 
     def __post_init__(self) -> None:
         if self.batch_size <= 0:
@@ -59,6 +61,12 @@ class TrainConfig:
             raise ValueError("early_stopping_min_delta cannot be negative")
         if self.grad_clip < 0:
             raise ValueError("grad_clip cannot be negative")
+        if self.selection_extra_weight < 0:
+            raise ValueError("selection_extra_weight cannot be negative")
+        if self.selection_extra_weight > 0 and not self.selection_extra_metric:
+            raise ValueError(
+                "selection_extra_metric is required when selection_extra_weight is positive"
+            )
 
 
 @dataclass
@@ -70,6 +78,7 @@ class ExperimentConfig:
     bpe_min_frequency: int = 2
     replay_data_path: str | None = None
     split_manifest_path: str | None = None
+    development_manifest_path: str | None = None
     old_data_ratio: float = 0.0
     reset_best_on_resume: bool = False
     model: ModelConfig = field(default_factory=ModelConfig)
@@ -98,6 +107,7 @@ class ExperimentConfig:
             "bpe_min_frequency": self.bpe_min_frequency,
             "replay_data_path": self.replay_data_path,
             "split_manifest_path": self.split_manifest_path,
+            "development_manifest_path": self.development_manifest_path,
             "old_data_ratio": self.old_data_ratio,
             "reset_best_on_resume": self.reset_best_on_resume,
             "model": asdict(self.model),
@@ -163,6 +173,8 @@ def load_config(path: str | Path) -> ExperimentConfig:
         "seed",
         "device",
         "checkpoint_dir",
+        "selection_extra_metric",
+        "selection_extra_weight",
     }
     model = ModelConfig(**{key: raw[key] for key in model_keys if key in raw})
     train = TrainConfig(**{key: raw[key] for key in train_keys if key in raw})
@@ -181,6 +193,11 @@ def load_config(path: str | Path) -> ExperimentConfig:
             None
             if raw.get("split_manifest_path") in {None, "", "null"}
             else str(raw["split_manifest_path"])
+        ),
+        development_manifest_path=(
+            None
+            if raw.get("development_manifest_path") in {None, "", "null"}
+            else str(raw["development_manifest_path"])
         ),
         old_data_ratio=float(raw.get("old_data_ratio", 0.0)),
         reset_best_on_resume=bool(raw.get("reset_best_on_resume", False)),

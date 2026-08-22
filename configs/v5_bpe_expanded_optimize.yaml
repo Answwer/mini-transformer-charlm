@@ -1,4 +1,4 @@
-# Independent v5 refinement of the active v4 checkpoint.
+# Independent v5 refinement from the immutable v4 checkpoint.
 # The tokenizer and model dimensions must remain identical to v4.
 data_path: data/expanded/dataset-expand.txt
 replay_data_path: data/tiny_shakespeare.txt

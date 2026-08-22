@@ -83,6 +83,7 @@ def save_checkpoint(
     metrics: dict[str, Any] | None = None,
     train_generator_state: torch.Tensor | None = None,
     checkpoint_metadata: dict[str, Any] | None = None,
+    best_selection_score: float | None = None,
 ) -> None:
     checkpoint = {
         "model_state": model.state_dict(),
@@ -92,6 +93,9 @@ def save_checkpoint(
         "tokenizer": tokenizer.state_dict(),
         "step": step,
         "best_val_loss": best_val_loss,
+        "best_selection_score": (
+            best_val_loss if best_selection_score is None else best_selection_score
+        ),
         "best_step": best_step,
         "tokens_seen": tokens_seen,
         "evaluations_without_improvement": evaluations_without_improvement,
@@ -130,6 +134,7 @@ def train_model(
     best_val_loss = float("inf")
     best_step = 0
     evaluations_without_improvement = 0
+    best_selection_score = float("inf")
     train_generator = torch.Generator().manual_seed(train_config.seed + 1)
     initial_tokens_seen = 0
     run_metadata = dict(checkpoint_metadata or {})
@@ -157,10 +162,14 @@ def train_model(
             )
         if reset_best_on_resume:
             best_val_loss = float("inf")
+            best_selection_score = float("inf")
             best_step = 0
             evaluations_without_improvement = 0
         else:
             best_val_loss = float(checkpoint["best_val_loss"])
+            best_selection_score = float(
+                checkpoint.get("best_selection_score", best_val_loss)
+            )
             best_step = int(checkpoint.get("best_step", start_step))
             evaluations_without_improvement = int(
                 checkpoint.get("evaluations_without_improvement", 0)
@@ -205,6 +214,7 @@ def train_model(
             tokenizer,
             start_step,
             best_val_loss,
+            best_selection_score=best_selection_score,
             tokens_seen=initial_tokens_seen,
             best_step=best_step,
             evaluations_without_improvement=evaluations_without_improvement,
@@ -248,9 +258,21 @@ def train_model(
                 last_metrics[name] = estimate_validation_loss(
                     model, extra_dataset, train_config, device
                 )
-            improved = last_metrics["val"] < best_val_loss - train_config.early_stopping_min_delta
+            selection_score = last_metrics["val"]
+            if train_config.selection_extra_metric is not None:
+                if train_config.selection_extra_metric not in last_metrics:
+                    raise ValueError(
+                        "selection_extra_metric is not present in evaluation metrics: "
+                        f"{train_config.selection_extra_metric}"
+                    )
+                selection_score += train_config.selection_extra_weight * last_metrics[
+                    train_config.selection_extra_metric
+                ]
+            last_metrics["selection_score"] = selection_score
+            improved = selection_score < best_selection_score - train_config.early_stopping_min_delta
             if improved:
                 best_val_loss = last_metrics["val"]
+                best_selection_score = selection_score
                 best_step = completed_step
                 evaluations_without_improvement = 0
             else:
@@ -281,6 +303,7 @@ def train_model(
                 tokenizer,
                 completed_step,
                 best_val_loss,
+                best_selection_score=best_selection_score,
                 tokens_seen=tokens_seen,
                 best_step=best_step,
                 evaluations_without_improvement=evaluations_without_improvement,
@@ -298,6 +321,7 @@ def train_model(
                     tokenizer,
                     completed_step,
                     best_val_loss,
+                    best_selection_score=best_selection_score,
                     tokens_seen=tokens_seen,
                     best_step=best_step,
                     evaluations_without_improvement=evaluations_without_improvement,

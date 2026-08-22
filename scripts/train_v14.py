@@ -66,7 +66,7 @@ def main() -> None:
             "unknown_ratio": unknown / len(encoded) if encoded else 0.0,
         }
 
-    def split_texts(path: Path, text: str) -> tuple[str, str, dict[str, object]]:
+    def split_texts(path: Path, text: str) -> tuple[dict[str, str], dict[str, object]]:
         report = json.loads(path.read_text(encoding="utf-8"))
         split_info = report.get("splits", {})
         work_groups = split_info.get("works", {})
@@ -76,10 +76,16 @@ def main() -> None:
         records = report.get("work_records", [])
         if not records:
             raise ValueError("split report is missing work_records with character offsets")
-        texts: dict[str, list[str]] = {"train": [], "validation": [], "test": []}
+        allowed_splits = {"train", "validation", "test", "development_validation"}
+        texts: dict[str, list[str]] = {
+            "train": [],
+            "validation": [],
+            "test": [],
+            "development_validation": [],
+        }
         for record in records:
             split = str(record.get("split", ""))
-            if split not in texts:
+            if split not in allowed_splits:
                 raise ValueError(f"invalid work split: {split}")
             start = int(record["char_start"])
             end = int(record["char_end"])
@@ -89,7 +95,26 @@ def main() -> None:
             "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
             "work_counts": {name: len(value) for name, value in texts.items()},
         }
-        return "\n\n".join(texts["train"]), "\n\n".join(texts["validation"]), metadata
+        return (
+            {
+                name: "\n\n".join(value)
+                for name, value in texts.items()
+                if value
+            },
+            metadata,
+        )
+
+    data_path = resolve_repo_path(config.data_path)
+    text = data_path.read_text(encoding="utf-8")
+    manifest_path = None
+    if config.development_manifest_path:
+        manifest_path = resolve_repo_path(config.development_manifest_path)
+    elif config.split_manifest_path:
+        manifest_path = resolve_repo_path(config.split_manifest_path)
+    split_bundle: dict[str, str] | None = None
+    split_metadata: dict[str, object] = {}
+    if manifest_path is not None:
+        split_bundle, split_metadata = split_texts(manifest_path, text)
 
     resume_path = resolve_repo_path(args.resume) if args.resume else None
     checkpoint: dict[str, object] | None = None
@@ -110,38 +135,38 @@ def main() -> None:
             )
         tokenizer_source = "parent_checkpoint"
     else:
-        data_path = resolve_repo_path(config.data_path)
-        text_for_tokenizer = data_path.read_text(encoding="utf-8")
-        split_index = int(len(text_for_tokenizer) * config.train_split)
+        text_for_tokenizer = (
+            split_bundle["train"]
+            if split_bundle is not None
+            else text[: int(len(text) * config.train_split)]
+        )
         tokenizer = BPETokenizer.from_text(
-            text_for_tokenizer[:split_index],
+            text_for_tokenizer,
             vocab_size=config.bpe_vocab_size,
             min_frequency=config.bpe_min_frequency,
         )
         tokenizer_source = "new_train_text"
 
-    data_path = resolve_repo_path(config.data_path)
-    text = data_path.read_text(encoding="utf-8")
-    split_report_path = (
-        resolve_repo_path(config.split_manifest_path)
-        if config.split_manifest_path
-        else None
-    )
-    split_metadata: dict[str, object] = {}
-    if split_report_path is not None:
-        train_text, val_text, split_metadata = split_texts(split_report_path, text)
-        dataset = CharDataset.from_split_texts(
-            train_text, val_text, tokenizer, config.model.block_size
-        )
-    else:
-        dataset = CharDataset(text, tokenizer, config.model.block_size, config.train_split)
     replay_path = (
         resolve_repo_path(config.replay_data_path)
         if config.replay_data_path
         else None
     )
     replay_text = replay_path.read_text(encoding="utf-8") if replay_path else None
-    if split_report_path is None:
+    if split_bundle is not None:
+        train_text = split_bundle["train"]
+        val_text = split_bundle["validation"]
+        dataset = CharDataset.from_split_texts(
+            train_text, val_text, tokenizer, config.model.block_size
+        )
+        if replay_text is not None and config.old_data_ratio > 0.0:
+            dataset.replay_train = CharDataset(
+                replay_text, tokenizer, config.model.block_size, config.train_split
+            ).train
+            dataset.train_mixture = ReplayWindowDataset(
+                dataset.train, dataset.replay_train, config.old_data_ratio
+            )
+    else:
         dataset = CharDataset(
             text,
             tokenizer,
@@ -149,13 +174,6 @@ def main() -> None:
             config.train_split,
             replay_text=replay_text,
             old_data_ratio=config.old_data_ratio,
-        )
-    elif replay_text is not None and config.old_data_ratio > 0.0:
-        dataset.replay_train = CharDataset(
-            replay_text, tokenizer, config.model.block_size, config.train_split
-        ).train
-        dataset.train_mixture = ReplayWindowDataset(
-            dataset.train, dataset.replay_train, config.old_data_ratio
         )
     checkpoint_dir = resolve_repo_path(config.train.checkpoint_dir)
     if resume_path is not None and checkpoint_dir.resolve() == resume_path.parent.resolve():
@@ -171,6 +189,11 @@ def main() -> None:
         "old_data_ratio": config.old_data_ratio,
         "split": split_metadata,
     }
+    if manifest_path is not None:
+        metadata["split_manifest_path"] = str(manifest_path.resolve())
+        metadata["development_validation_present"] = (
+            split_bundle is not None and "development_validation" in split_bundle
+        )
     if replay_path is not None and replay_text is not None:
         metadata["replay_data"] = data_metadata(replay_path, replay_text, tokenizer)
     if checkpoint is not None:
@@ -187,6 +210,13 @@ def main() -> None:
             f"replay_unk_ratio={metadata['replay_data']['unknown_ratio']:.6f}"
         )
     extra_eval_datasets = {}
+    if split_bundle is not None and "development_validation" in split_bundle:
+        extra_eval_datasets["development_validation"] = CharDataset.from_split_texts(
+            split_bundle["train"],
+            split_bundle["development_validation"],
+            tokenizer,
+            config.model.block_size,
+        )
     if replay_path is not None:
         extra_eval_datasets["old_val_loss"] = CharDataset(
             replay_text or "", tokenizer, config.model.block_size, config.train_split

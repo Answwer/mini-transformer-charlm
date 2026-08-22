@@ -1,49 +1,95 @@
-# Historical v14, v4/v5/v6 baselines, and active v5
+# 最终实验结果：v5
 
-The historical v14 checkpoint and its Kaggle artifacts are preserved under
-`work/history_v14_*`. v4 remains an immutable baseline under
-`work/kaggle_expanded_optimize_output_v4`; v5 is preserved in
-`work/kaggle_v5_output`; v6 remains an independent comparison in
-`work/kaggle_v6_output`; v8 is an independent continuation attempt in
-`work/kaggle_v8_output`. The current active result is v5. No checkpoint
-directory is shared.
+## 结论
 
-## Fixed metrics
+v5 是当前正式活动结果。它从 v4 best.pt 继续训练，使用旧的 512 BPE、扩容 Shakespeare 数据和 15% old-data replay。v5 在 expanded test 上优于 v4、v6、v8 和独立 1024 BPE v9。
 
-| Result | Evaluation corpus | Validation loss | Validation PPL | Test loss | Test PPL | Old validation loss / PPL | Best step | Tokens seen |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Historical v14 | original corpus | 2.378887 | 10.7929 | not evaluated | not evaluated | 2.378887 / 10.7929 | selected by validation | not recorded |
-| Baseline v4 | expanded corpus | 2.350902 | 10.495 | 2.23216 | 9.32 | 1.921622 / 6.832 | 60,000 | 245,760,000 |
-| Active v5 | expanded corpus | 2.347299 | 10.457 | 1.99964 | 7.386 | 1.913685 / 6.778 | 64,000 | 262,144,000 |
-| Independent v6 | expanded corpus | 2.344260 | 10.426 | 2.00347 | 7.415 | 1.906484 / 6.729 | 80,000 | 327,680,000 |
-| v8 continuation (no improvement) | expanded corpus | 2.347299 | 10.457 | 1.99964 | 7.386 | 1.913685 / 6.778 | 64,000 | 262,144,000 |
+## v5 正式指标
 
-The v6 expanded validation loss is the best of the three active-family runs:
-`0.006643` lower than v4 and `0.003039` lower than v5. Its old-corpus
-validation loss is also lowest (`1.906484`). v5 has the lowest expanded test
-loss/PPL (`1.999644` / `7.386`) while v6 is slightly higher (`2.003474` /
-`7.415`), so test performance is not uniformly improved. These are controlled
-comparisons within the same BPE family and expanded split; they are not
-semantic scores. The older v4-versus-historical-v14 loss comparison remains
-cross-corpus and is not treated as a controlled metric.
+| 指标 | v5 |
+| --- | ---: |
+| Expanded validation loss / PPL / BPB | 2.347299 / 10.457 / 2.0009 |
+| Development validation loss / PPL / BPB | 1.824066 / 6.197 / 1.5579 |
+| Expanded test loss / PPL / BPB | 1.999644 / 7.386 / 1.6784 |
+| Old validation loss / PPL | 1.913685 / 6.778 |
+| Best step | 64,000 |
+| Tokens seen | 262,144,000 |
+| 参数量 | 3,422,208 |
+| best.pt SHA-256 | 256775abb523fea7d663908431272aba8aaaf0a43f335eb382d4020459f42b2a |
+| Kaggle 状态 | COMPLETE |
 
-## Fixed-prompt generation
+v5 Kaggle Notebook：[mini-transformer-bpe-lm-expanded-optimize-v5](https://www.kaggle.com/code/answerr5/mini-transformer-bpe-lm-expanded-optimize-v5)
 
-All results use the same BPE model family, seed `7`, temperature `0.7`, top-k
-`40`, top-p `0.9`, repetition penalty `1.05`, and a sentence-boundary guard.
-The v4, v5, and v6 samples are recorded in `v4_result.json`, `v5_result.json`,
-and `v6_result.json`. Across the four prompts, all three avoid an obvious
-repeated 3-gram loop. v4 has a sentence-boundary-safe but very short `The king`
-continuation; v5 produces a complete-looking `To be` continuation but still
-joins unrelated speakers; v6 has the shortest `The king` sample with trailing
-blank lines and a compressed `To be` continuation. All three still make
-semantic jumps and none establishes full semantic understanding. Historical v14
-has one visibly truncated prompt sample and more local continuation drift.
+## 版本对比
 
-The active result remains v5 because it has the best expanded test loss/PPL and
-the best overall balance with fixed-prompt generation. v6 has slightly lower
-validation losses but a slightly worse expanded test result and less stable raw
-generation in the v7 multi-seed diagnostic. v8 was a separate continuation from
-v5 with old-data replay 0.20 and learning rate 5e-6; it early-stopped without
-beating v5, so its best checkpoint is retained only as a negative comparison.
-All versions have independent checkpoints, notebooks, and output directories.
+| 版本 | 训练关系 | Expanded val loss / PPL | Expanded test loss / PPL | Old val loss / PPL | Best step | 结论 |
+| --- | --- | ---: | ---: | ---: | ---: | --- |
+| 历史 v1/v14 | 原始语料基线 | 不适用 | 未测 | 2.378887 / 10.793 | 历史最佳点 | 只读历史 |
+| v4 | 扩容数据 512 BPE 基线 | 2.350902 / 10.495 | 2.232163 / 9.320 | 1.921622 / 6.832 | 60,000 | 不可变基线 |
+| v5 | 从 v4 续训，replay=0.15 | **2.347299 / 10.457** | **1.999644 / 7.386** | 1.913685 / 6.778 | **64,000** | **正式结果** |
+| v6 | 从 v4 独立续训，replay=0.10 | 2.344260 / 10.426 | 2.003474 / 7.415 | **1.906484 / 6.729** | 80,000 | 独立对照 |
+| v8 | 从 v5 续训，replay=0.20 | 2.347299 / 10.457 | 1.999644 / 7.386 | 1.913685 / 6.778 | 64,000 | 未超过 v5 |
+| v9 | 新 1024 BPE，从零训练 | 2.663134 / 14.341 | 2.452331 / 11.615 | 2.482651 / 11.973 | 22,000 | 负对照 |
+
+## v5 训练配置
+
+- tokenizer：512 BPE；
+- 模型：4 层、8 头、256 维，block size=256；
+- 参数量：3,422,208；
+- batch size：16；
+- learning rate：1e-5；
+- old-data replay：0.15；
+- optimizer：AdamW，恢复 v4 optimizer state；
+- early stopping：expanded validation loss；
+- GPU：Tesla P100-PCIE-16GB；
+- PyTorch：2.5.1+cu124；
+- 测试：21/21 passed。
+
+父 checkpoint：
+
+    v4 best.pt
+    SHA-256: 369d43e5428f8229fda84a5bcdaee9a20ad11d01ab1a6f64091aed31b9d4874b
+
+扩容数据：
+
+    C:\Users\86151\Desktop\dataset-expand.txt
+    SHA-256: 79edbbbd07a86f58cc14e1447c1242ed1e3f645b08bf996fd307cbcbe586d320
+
+## 生成诊断
+
+固定 5 prompts × 3 seeds，使用相同采样设置。raw/guarded 统计：
+
+| 诊断 | v5 | v9 |
+| --- | ---: | ---: |
+| Sentence termination | 17/30 | 17/30 |
+| Half-sentence tails | 12 | 13 |
+| Repeated trigrams | 0 | 6 |
+| Duplicate lines | 0 | 11 |
+| Speaker-label switches | 14 | 16 |
+
+v5 示例：
+
+    Prompt: The king
+    The king, my Lord of Somerset, and you
+    Sent with him at your sister.
+
+模型仍可能混合角色和作品；guard 只是后处理，不代表完整语义理解。
+
+## 结果选择规则
+
+v5 作为正式结果的原因：
+
+1. expanded test loss/PPL 是当前最好；
+2. validation 与 test 之间没有明显冲突；
+3. v6 虽然 validation 略低，但 test 略高；
+4. v8 没有产生优于 v5 的 checkpoint；
+5. v9 的 1024 BPE 训练不足，所有主要 loss/PPL 均低于 v5。
+
+所有历史 checkpoint、Notebook、结果 JSON 和输出目录均独立保存，后续实验不得覆盖 v5。
+
+## 平台状态
+
+- 主 GitHub 仓库：[Answwer/mini-transformer-charlm](https://github.com/Answwer/mini-transformer-charlm)
+- 独立 v9 GitHub 仓库：[Answwer/mini-transformer-bpe1024-dev-v9](https://github.com/Answwer/mini-transformer-bpe1024-dev-v9)
+- v9 PR：[PR #1](https://github.com/Answwer/mini-transformer-bpe1024-dev-v9/pull/1)，保留为独立对照记录；
+- 上级交付入口应优先查看本仓库 README、SUPERVISOR_REPORT.md 和 v5 Kaggle Notebook。
