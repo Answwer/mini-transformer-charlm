@@ -1,0 +1,1761 @@
+{
+  "experiment": "v14_bpe1024_development_v9",
+  "device": "Tesla P100-PCIE-16GB",
+  "github_repo": "https://github.com/Answwer/mini-transformer-bpe1024-dev-v9",
+  "github_branch": "codex/add-bpb-evaluation",
+  "v5_baseline": {
+    "checkpoint": "/kaggle/working/mini-transformer-bpe1024-dev-v9/work/v5_best_readonly.pt",
+    "sha256": "256775abb523fea7d663908431272aba8aaaf0a43f335eb382d4020459f42b2a",
+    "read_only": true
+  },
+  "v9_checkpoint": {
+    "best": "/kaggle/working/mini-transformer-bpe1024-dev-v9/checkpoints/v14_bpe1024_development_v9/best.pt",
+    "last": "/kaggle/working/mini-transformer-bpe1024-dev-v9/checkpoints/v14_bpe1024_development_v9/last.pt",
+    "sha256": "aa3c120a7a05bf19b0965d9096a0a5fedfc5bea0437d194b3ccd1bebf81a6b45",
+    "best_step": 22000,
+    "tokens_seen": 90112000,
+    "parameters": 3684864
+  },
+  "v9_training": {
+    "step": 22000,
+    "best_step": 22000,
+    "tokens_seen": 90112000,
+    "best_val_loss": 2.663133907318115,
+    "metrics": {
+      "train": 2.039535391330719,
+      "val": 2.663133907318115,
+      "development_validation": 2.545897698402405,
+      "old_val_loss": 2.482651138305664,
+      "selection_score": 3.9360827565193173
+    },
+    "checkpoint_metadata": {
+      "experiment": "v14_bpe",
+      "tokenizer_source": "new_train_text",
+      "tokenizer_vocab_size": 1024,
+      "data": {
+        "path": "/kaggle/working/mini-transformer-bpe1024-dev-v9/data/expanded/dataset-expand.txt",
+        "sha256": "79edbbbd07a86f58cc14e1447c1242ed1e3f645b08bf996fd307cbcbe586d320",
+        "utf8_bytes": 5085615,
+        "characters": 5024557,
+        "tokens": 2708841,
+        "unknown_tokens": 28,
+        "unknown_ratio": 1.0336523996794201e-05
+      },
+      "old_data_ratio": 0.0,
+      "split": {
+        "path": "/kaggle/working/mini-transformer-bpe1024-dev-v9/data/expanded/development_manifest_v9.json",
+        "sha256": "07ae2a984a2b194867f0e088fed491d33a2bc98a2eb8fc1572260c396d38b657",
+        "work_counts": {
+          "train": 27,
+          "validation": 3,
+          "test": 5,
+          "development_validation": 3
+        }
+      },
+      "split_manifest_path": "/kaggle/working/mini-transformer-bpe1024-dev-v9/data/expanded/development_manifest_v9.json",
+      "development_validation_present": true,
+      "replay_data": {
+        "path": "/kaggle/working/mini-transformer-bpe1024-dev-v9/data/tiny_shakespeare.txt",
+        "sha256": "53493bf304b639aba6a47400da75c58ce32372b378fd2cd9d16ee987aeb12e4e",
+        "utf8_bytes": 1115393,
+        "characters": 1115393,
+        "tokens": 602356,
+        "unknown_tokens": 6188,
+        "unknown_ratio": 0.010272994707448751
+      }
+    }
+  },
+  "evaluations": {
+    "v5": {
+      "checkpoint": "/kaggle/working/mini-transformer-bpe1024-dev-v9/work/v5_best_readonly.pt",
+      "step": 64000,
+      "best_step": 64000,
+      "tokens_seen": 262144000,
+      "parameters": 3422208,
+      "generation_protocol": {
+        "prompts": [
+          "The king",
+          "Before we proceed",
+          "To be, or not to be:",
+          "Friends, Romans, countrymen",
+          "All the world's a stage"
+        ],
+        "seeds": [
+          7,
+          17,
+          29
+        ],
+        "temperature": 0.7,
+        "top_k": 40,
+        "top_p": 0.9,
+        "repetition_penalty": 1.05,
+        "min_new_tokens": 24,
+        "max_new_tokens": 120
+      },
+      "metrics": {
+        "expanded_validation_loss": 2.347298836708069,
+        "expanded_test_loss": 1.9996444702148437,
+        "old_validation_loss": 1.9136853456497191,
+        "development_validation_loss": 1.8240656733512879,
+        "expanded_validation_ppl": 10.457284707115754,
+        "expanded_test_ppl": 7.386429536341573,
+        "old_validation_ppl": 6.778022180803111,
+        "expanded_validation_bpb": 2.0008581148097466,
+        "expanded_test_bpb": 1.678441352955931,
+        "development_validation_ppl": 6.197002288994477,
+        "development_validation_bpb": 1.5579188060989786
+      },
+      "generations": {
+        "The king": {
+          "7": {
+            "raw": {
+              "text": "The king, my Lord of Somerset, and you\nSent with him at your sister.\n\nPOLONIUS:\nNay, Ill give you leave your daughter.\n\nMESSALA:\nMay you be sure your passion to your grace?\nWhat, are you there? Let us not come in your ",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 2,
+                "speaker_label_switch_count": 1
+              }
+            },
+            "guarded": {
+              "text": "The king, my Lord of Somerset, and you\nSent with him at your sister.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 150
+          },
+          "17": {
+            "raw": {
+              "text": "The king is at your service.\n\nKING:\nWhat wouldst thou do? A journey? Give me thy hand,\nThou art a prince and traitor? I know not well,\nAnd thou, though he went for my cousin Margaret\nWill take my life; and I will not speak of thee.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "The king is at your service.\n\nKING:\nWhat wouldst thou do?",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 174
+          },
+          "29": {
+            "raw": {
+              "text": "The kingdom, and that hath done the Duke of York.\n\nYORK:\nWere not the crown of England doth not stay.\n\nRICHARD:\nO Humphrey is not in his power tongue,\nThou gavst me with a banishment of mine.\n\nKING HENRY:\nWarwick, I come",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 2
+              }
+            },
+            "guarded": {
+              "text": "The kingdom, and that hath done the Duke of York.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 171
+          }
+        },
+        "Before we proceed": {
+          "7": {
+            "raw": {
+              "text": "Before we proceed,\nAre we to sleep.\n\nExit Falstaff and Soldiers.\n\nWOLSEY:\nLet us go seek the King of England,\nAnd send our troops to the Kings death.\nMine eyes are dry with us to serve his friend,\nAnd now we do ",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "Before we proceed,\nAre we to sleep.\n\nExit Falstaff and Soldiers.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 147
+          },
+          "17": {
+            "raw": {
+              "text": "Before we proceed\nThe people of the crown and the first of men\nHave been power to our wit. Say you tell me,\nAnd you shall be so cunningly to be done\nWith that which I would concern him of them,\nAnd I shall prove a tribute to my dut",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "Before we proceed\nThe people of the crown and the first of men\nHave been power to our wit.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 141
+          },
+          "29": {
+            "raw": {
+              "text": "Before we proceed,\nAs the foul wits of a champion sleeps,\nWhen great subjects and touchd on the sun,\nHis silver skill in his piety.\n\nNORFOLK:\nNow will I be murderer.\n\nKING RICHARD III:\nWhat is the matter?",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 2,
+                "speaker_label_switch_count": 1
+              }
+            },
+            "guarded": {
+              "text": "Before we proceed,\nAs the foul wits of a champion sleeps,\nWhen great subjects and touchd on the sun,\nHis silver skill in his piety.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 73
+          }
+        },
+        "To be, or not to be:": {
+          "7": {
+            "raw": {
+              "text": "To be, or not to be:\nAnd now the Kings incurable of his love,\nAnd put his business to his evil tongue.\n\nEnter Lear, Lady Peadon and Musicians.\n\nJESSICA:\nWell, sir, believe me, I will take him away.\nLo, if you have not ",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "To be, or not to be:\nAnd now the Kings incurable of his love,\nAnd put his business to his evil tongue.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 116
+          },
+          "17": {
+            "raw": {
+              "text": "To be, or not to be:\nFor those soft I am not to make thee bad,\nBut with thy foul deeds of my foes and mine.\nMy tongue is not so grievously thou art.\nAnd yet I will write my love to thee,\nWhen I should have done a palm to me",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "To be, or not to be:\nFor those soft I am not to make thee bad,\nBut with thy foul deeds of my foes and mine.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 116
+          },
+          "29": {
+            "raw": {
+              "text": "To be, or not to be: I have no harm,\nBut I will follow thee.\n\nEnter a Servant.\n\nCLOWN:\nNay, I shall not, sir.\n\nExeunt Sir Toby.\n\nOLIVIA:\nTherefore, for you, Malvolio.\n\nPOLIXENES:\nHow long is this?\n\nFIRST SOL",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 2
+              }
+            },
+            "guarded": {
+              "text": "To be, or not to be: I have no harm,\nBut I will follow thee.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 147
+          }
+        },
+        "Friends, Romans, countrymen": {
+          "7": {
+            "raw": {
+              "text": "Friends, Romans, countrymen, Albany, Sir Toby,\nArt the English fatal foe.\n\nBEATRICE:\nAy, and you were born as you see.\n\nMISTRESS PAGE:\nWell, we will not for you.\n\nFIRST MUSICIAN:\nThe garments of our common",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 2
+              }
+            },
+            "guarded": {
+              "text": "Friends, Romans, countrymen, Albany, Sir Toby,\nArt the English fatal foe.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 132
+          },
+          "17": {
+            "raw": {
+              "text": "Friends, Romans, countrymen, I will be yours.\n\nEnter the Great Lady Montague, Sir John Falstaff.\n\nExit Sir Toby and Page.\n\nBARDOLPH:\nFie, how canst thou learn to you wrong?\n\nEnter Falstaff and Page.\n\nFALSTAFF:\n",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 2,
+                "speaker_label_switch_count": 1
+              }
+            },
+            "guarded": {
+              "text": "Friends, Romans, countrymen, I will be yours.\n\nEnter the Great Lady Montague, Sir John Falstaff.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 114
+          },
+          "29": {
+            "raw": {
+              "text": "Friends, Romans, countrymen, and the course.\n\nKING:\nHad you been so long as a sorrow doth deliver\nYour guard, and that you will not be so coldly\nThat I may see you so long against your service\nTo speak with him. You are a cruel of it.\nThis ",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "Friends, Romans, countrymen, and the course.\n\nKING:\nHad you been so long as a sorrow doth deliver\nYour guard, and that you will not be so coldly\nThat I may see you so long against your service\nTo speak with him.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 29
+          }
+        },
+        "All the world's a stage": {
+          "7": {
+            "raw": {
+              "text": "All the world's a stage, or a dame of the power.\n\nFLORIZEL:\nI would not be done; yet I am the way of it.\nMy master is no sorrow, my lord; and I\ncan give her leave with you to serve the court.\n\nPOLIXENES:\nAnd you must say so",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 2,
+                "speaker_label_switch_count": 1
+              }
+            },
+            "guarded": {
+              "text": "All the world's a stage, or a dame of the power.\n\nFLORIZEL:\nI would not be done; yet I am the way of it.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 119
+          },
+          "17": {
+            "raw": {
+              "text": "All the world's a stage, and he that calls himself\nand his bondage and his followers and his sons.\n\nKING HENRY VI:\nMy Lord of Westmoreland, I will not do it.\n\nCLIFFORD:\nWhat would you say?\n\nQUEEN MARGARET:\nThe king is but unkindness to your kingly.\n\nYORK",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 2
+              }
+            },
+            "guarded": {
+              "text": "All the world's a stage, and he that calls himself\nand his bondage and his followers and his sons.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 156
+          },
+          "29": {
+            "raw": {
+              "text": "All the world's a stage,\nAs the fatal and the cheek of two men\nMay seem to be spoke out.\n\nBRUTUS:\nAy, but not a gallant that I should be.\n\nSICINIUS:\nO God, I fear!\n\nCORIOLANUS:\nI have spoke of these service I am so sure",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 2
+              }
+            },
+            "guarded": {
+              "text": "All the world's a stage,\nAs the fatal and the cheek of two men\nMay seem to be spoke out.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 131
+          }
+        }
+      }
+    },
+    "v9": {
+      "checkpoint": "/kaggle/working/mini-transformer-bpe1024-dev-v9/checkpoints/v14_bpe1024_development_v9/best.pt",
+      "step": 22000,
+      "best_step": 22000,
+      "tokens_seen": 90112000,
+      "parameters": 3684864,
+      "generation_protocol": {
+        "prompts": [
+          "The king",
+          "Before we proceed",
+          "To be, or not to be:",
+          "Friends, Romans, countrymen",
+          "All the world's a stage"
+        ],
+        "seeds": [
+          7,
+          17,
+          29
+        ],
+        "temperature": 0.7,
+        "top_k": 40,
+        "top_p": 0.9,
+        "repetition_penalty": 1.05,
+        "min_new_tokens": 24,
+        "max_new_tokens": 120
+      },
+      "metrics": {
+        "expanded_validation_loss": 2.663133907318115,
+        "expanded_test_loss": 2.4523308753967283,
+        "old_validation_loss": 2.482651138305664,
+        "development_validation_loss": 2.545897698402405,
+        "expanded_validation_ppl": 14.34116262171031,
+        "expanded_test_ppl": 11.615389215581253,
+        "old_validation_ppl": 11.972964363268108,
+        "expanded_validation_bpb": 2.0736603693761033,
+        "expanded_test_bpb": 1.8730010554500585,
+        "development_validation_ppl": 12.754672797740987,
+        "development_validation_bpb": 1.994648620816266
+      },
+      "generations": {
+        "The king": {
+          "7": {
+            "raw": {
+              "text": "The king is to me and all our sister shall\nWithin this dream.\n\nEnter the Fairies with Aaron, bearing the cardinal.\n\nGLOUCESTER:\nHear you, sir, I think you are not well.\n\nPETRUCHIO:\nNo, my lord.\n\nCRANMER:\nA good Malvolio. I ",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 2
+              }
+            },
+            "guarded": {
+              "text": "The king is to me and all our sister shall\nWithin this dream.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 162
+          },
+          "17": {
+            "raw": {
+              "text": "The king of England shall be delivered.\n\nYORK:\nSweet lord, I think, if you have a son of Suffolk.\nIf you come in this device to your love,\nI would not be your own to my son,\nI should be hanged, but your power to you.\nI will ",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "The king of England shall be delivered.\n\nYORK:\nSweet lord, I think, if you have a son of Suffolk.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 127
+          },
+          "29": {
+            "raw": {
+              "text": "The king of his power,\nShould be the power of this distract.\n\nPANDULPH:\nNo, my lord,\nI think not on the petitions of it.\n\nKING RICHARD:\nWhat say you?\n\nKING RICHARD:\nI think it is thy kingdom, but my sons\nTo give thee from this which thou",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 1,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 1
+              }
+            },
+            "guarded": {
+              "text": "The king of his power,\nShould be the power of this distract.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 177
+          }
+        },
+        "Before we proceed": {
+          "7": {
+            "raw": {
+              "text": "Before we proceed to be of him.\n\nTITUS:\nShould you were not in your patience?\n\nPAROLLES:\nA good good life, sir. I cannot do but know\nThe buggage that I have seen you from the stock.\n\nKING:\nI do desire you, my lord, and you shall have me.\n\n",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 2
+              }
+            },
+            "guarded": {
+              "text": "Before we proceed to be of him.\n\nTITUS:\nShould you were not in your patience?",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 162
+          },
+          "17": {
+            "raw": {
+              "text": "Before we proceed to our fashion.\n\nBOLINGBROKE:\nWhat should we do?\n\nBOLINGBROKE:\nWhere should our fault were to send the fight?\n\nKING RICHARD:\nWhat should we do?\n\nBOLINGBROKE:\nWhat say’st thou, Demetrius? O, didst thou not know\nHow you will seem ",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 3,
+                "duplicate_line_count": 3,
+                "half_sentence_tail": true,
+                "speaker_label_count": 4,
+                "speaker_label_switch_count": 1
+              }
+            },
+            "guarded": {
+              "text": "Before we proceed to our fashion.\n\nBOLINGBROKE:\nWhat should we do?",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 180
+          },
+          "29": {
+            "raw": {
+              "text": "Before we proceed the fruitless cries.\n\nKING:\nWas we in armour of our dangerous kings?\n\nQUEEN:\nAnd what is this the world I mean to be done?\n\nGLOUCESTER:\nWhat say you to a bond in the world?\n\nHAMLET:\nHe is not so much that you did refer him.\n\nGLOU",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 4,
+                "speaker_label_switch_count": 3
+              }
+            },
+            "guarded": {
+              "text": "Before we proceed the fruitless cries.\n\nKING:\nWas we in armour of our dangerous kings?",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 161
+          }
+        },
+        "To be, or not to be:": {
+          "7": {
+            "raw": {
+              "text": "To be, or not to be: I will not stay.\n\nPAROLLES:\nYou shall not hear me.\n\nKING:\nAway, away! I am glad to see my soul.\n\nBERTRAM:\nI will prove that four persons your heads.\n\nKING:\nMy lord, I am sorry to be content.\nI was a king’s father here for",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 1,
+                "half_sentence_tail": true,
+                "speaker_label_count": 4,
+                "speaker_label_switch_count": 2
+              }
+            },
+            "guarded": {
+              "text": "To be, or not to be: I will not stay.\n\nPAROLLES:\nYou shall not hear me.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 171
+          },
+          "17": {
+            "raw": {
+              "text": "To be, or not to be: I’ll make thee wait at thy head.\n\nFALSTAFF:\nI am not for thee.\n\nPRINCE:\nWhy, then, I’ll see thee with thy foul danger.\n\nFALSTAFF:\nI am not at thy commendation. One of my heart of my wishelcock I must\nnot be the base of the field",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 2,
+                "duplicate_line_count": 1,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 1
+              }
+            },
+            "guarded": {
+              "text": "To be, or not to be: I’ll make thee wait at thy head.\n\nFALSTAFF:\nI am not for thee.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 166
+          },
+          "29": {
+            "raw": {
+              "text": "To be, or not to be: I’ll be a dozen.\n\nPROTEUS:\nNo, sir, nor any other thing to see you.\n\nVALENTINE:\nNo more than to you in your hand, but I will have you satisfied.\n\nVALENTINE:\nBut I am glad to you, I think your pleasure is not.\n\nPROTEUS:\nNo",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 2,
+                "half_sentence_tail": true,
+                "speaker_label_count": 4,
+                "speaker_label_switch_count": 1
+              }
+            },
+            "guarded": {
+              "text": "To be, or not to be: I’ll be a dozen.\n\nPROTEUS:\nNo, sir, nor any other thing to see you.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 154
+          }
+        },
+        "Friends, Romans, countrymen": {
+          "7": {
+            "raw": {
+              "text": "Friends, Romans, countrymen,\nWhose heart and embraces bended with blood,\nThe several person of the fiery stars.\nTheir charms have a horn of silken buds,\nThat we have found for cracked and the woods,\nShall not be removed in his vows.\n\nKING JOHN",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "Friends, Romans, countrymen,\nWhose heart and embraces bended with blood,\nThe several person of the fiery stars.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 132
+          },
+          "17": {
+            "raw": {
+              "text": "Friends, Romans, countrymen,\nWhose foul vows are to the other fourteen.\n\nEnter the Bastard.\n\nPEDANT:\nWho hath a man to slander of a dangerous mire?\nWhat should he do?\n\nPALAMON:\nHath he a wonderful staff of that same day?\n\nPALAMON:\nA profane ",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 1,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 1
+              }
+            },
+            "guarded": {
+              "text": "Friends, Romans, countrymen,\nWhose foul vows are to the other fourteen.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 170
+          },
+          "29": {
+            "raw": {
+              "text": "Friends, Romans, countrymen, and their deceitful pounds.\n\nFALSTAFF:\nMadam, I would not have spoke of them.\n\nFALSTAFF:\nI would not be such a foolish to you.\n\nFALSTAFF:\nO, I hope you see you well. Let me see how I shall tell you, I think your\ndispleasure is not so much as ",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 1,
+                "duplicate_line_count": 2,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "Friends, Romans, countrymen, and their deceitful pounds.\n\nFALSTAFF:\nMadam, I would not have spoke of them.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 165
+          }
+        },
+        "All the world's a stage": {
+          "7": {
+            "raw": {
+              "text": "All the worlds a stage,\nAnd the wars of heaven shall be to skin,\nAnd in their passion of the devilish season,\nI can discover thee. Only I will buy\nThy sister thy free extremity to thy son.\n\nKING RICHARD:\nNo more than my brother hath been of thee.\nMy friends",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "All the worlds a stage,\nAnd the wars of heaven shall be to skin,\nAnd in their passion of the devilish season,\nI can discover thee.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 127
+          },
+          "17": {
+            "raw": {
+              "text": "All the worlds a stage,\nAnd in the valour of the moon’s power.\n\n“And this is all the devil hath done you,\nSince he was mad and to woo this hate,\nThat he hath made me to the world that he went,\nBut I will not fine and all the greetings,\nWhich he that",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "All the worlds a stage,\nAnd in the valour of the moon’s power.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 187
+          },
+          "29": {
+            "raw": {
+              "text": "All the worlds a stage of thy head,\nAnd thou hast done me in the basket.\n\nLUCIUS:\nI am not for thee, and thou dost not hear.\n\nDEMETRIUS:\nDo thou not hear me?\n\nLYSANDER:\nWhy, so I think thou art as well as thou.\nThou hast no man so much to me. ",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 2
+              }
+            },
+            "guarded": {
+              "text": "All the worlds a stage of thy head,\nAnd thou hast done me in the basket.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 171
+          }
+        }
+      }
+    }
+  },
+  "comparison": {
+    "metrics": {
+      "v5": {
+        "expanded_validation_loss": 2.347298836708069,
+        "expanded_validation_ppl": 10.457284707115754,
+        "expanded_validation_bpb": 2.0008581148097466,
+        "development_validation_loss": 1.8240656733512879,
+        "development_validation_ppl": 6.197002288994477,
+        "development_validation_bpb": 1.5579188060989786,
+        "expanded_test_loss": 1.9996444702148437,
+        "expanded_test_ppl": 7.386429536341573,
+        "expanded_test_bpb": 1.678441352955931,
+        "old_validation_loss": 1.9136853456497191,
+        "old_validation_ppl": 6.778022180803111
+      },
+      "v9": {
+        "expanded_validation_loss": 2.663133907318115,
+        "expanded_validation_ppl": 14.34116262171031,
+        "expanded_validation_bpb": 2.0736603693761033,
+        "development_validation_loss": 2.545897698402405,
+        "development_validation_ppl": 12.754672797740987,
+        "development_validation_bpb": 1.994648620816266,
+        "expanded_test_loss": 2.4523308753967283,
+        "expanded_test_ppl": 11.615389215581253,
+        "expanded_test_bpb": 1.8730010554500585,
+        "old_validation_loss": 2.482651138305664,
+        "old_validation_ppl": 11.972964363268108
+      }
+    },
+    "delta_v9_minus_v5": {
+      "expanded_validation_loss": 0.3158350706100461,
+      "expanded_validation_ppl": 3.8838779145945566,
+      "expanded_validation_bpb": 0.0728022545663567,
+      "development_validation_loss": 0.721832025051117,
+      "development_validation_ppl": 6.557670508746511,
+      "development_validation_bpb": 0.43672981471728733,
+      "expanded_test_loss": 0.45268640518188463,
+      "expanded_test_ppl": 4.22895967923968,
+      "expanded_test_bpb": 0.19455970249412746,
+      "old_validation_loss": 0.5689657926559448,
+      "old_validation_ppl": 5.194942182464997
+    },
+    "generation_quality": {
+      "v5": {
+        "samples": 30,
+        "sentence_terminated": 17,
+        "half_sentence_tail": 12,
+        "repeated_trigram_count": 0,
+        "duplicate_line_count": 0,
+        "speaker_label_switch_count": 14
+      },
+      "v9": {
+        "samples": 30,
+        "sentence_terminated": 17,
+        "half_sentence_tail": 13,
+        "repeated_trigram_count": 6,
+        "duplicate_line_count": 11,
+        "speaker_label_switch_count": 16
+      }
+    },
+    "fixed_prompt_generations": {
+      "v5": {
+        "The king": {
+          "7": {
+            "raw": {
+              "text": "The king, my Lord of Somerset, and you\nSent with him at your sister.\n\nPOLONIUS:\nNay, Ill give you leave your daughter.\n\nMESSALA:\nMay you be sure your passion to your grace?\nWhat, are you there? Let us not come in your ",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 2,
+                "speaker_label_switch_count": 1
+              }
+            },
+            "guarded": {
+              "text": "The king, my Lord of Somerset, and you\nSent with him at your sister.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 150
+          },
+          "17": {
+            "raw": {
+              "text": "The king is at your service.\n\nKING:\nWhat wouldst thou do? A journey? Give me thy hand,\nThou art a prince and traitor? I know not well,\nAnd thou, though he went for my cousin Margaret\nWill take my life; and I will not speak of thee.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "The king is at your service.\n\nKING:\nWhat wouldst thou do?",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 174
+          },
+          "29": {
+            "raw": {
+              "text": "The kingdom, and that hath done the Duke of York.\n\nYORK:\nWere not the crown of England doth not stay.\n\nRICHARD:\nO Humphrey is not in his power tongue,\nThou gavst me with a banishment of mine.\n\nKING HENRY:\nWarwick, I come",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 2
+              }
+            },
+            "guarded": {
+              "text": "The kingdom, and that hath done the Duke of York.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 171
+          }
+        },
+        "Before we proceed": {
+          "7": {
+            "raw": {
+              "text": "Before we proceed,\nAre we to sleep.\n\nExit Falstaff and Soldiers.\n\nWOLSEY:\nLet us go seek the King of England,\nAnd send our troops to the Kings death.\nMine eyes are dry with us to serve his friend,\nAnd now we do ",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "Before we proceed,\nAre we to sleep.\n\nExit Falstaff and Soldiers.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 147
+          },
+          "17": {
+            "raw": {
+              "text": "Before we proceed\nThe people of the crown and the first of men\nHave been power to our wit. Say you tell me,\nAnd you shall be so cunningly to be done\nWith that which I would concern him of them,\nAnd I shall prove a tribute to my dut",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "Before we proceed\nThe people of the crown and the first of men\nHave been power to our wit.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 141
+          },
+          "29": {
+            "raw": {
+              "text": "Before we proceed,\nAs the foul wits of a champion sleeps,\nWhen great subjects and touchd on the sun,\nHis silver skill in his piety.\n\nNORFOLK:\nNow will I be murderer.\n\nKING RICHARD III:\nWhat is the matter?",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 2,
+                "speaker_label_switch_count": 1
+              }
+            },
+            "guarded": {
+              "text": "Before we proceed,\nAs the foul wits of a champion sleeps,\nWhen great subjects and touchd on the sun,\nHis silver skill in his piety.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 73
+          }
+        },
+        "To be, or not to be:": {
+          "7": {
+            "raw": {
+              "text": "To be, or not to be:\nAnd now the Kings incurable of his love,\nAnd put his business to his evil tongue.\n\nEnter Lear, Lady Peadon and Musicians.\n\nJESSICA:\nWell, sir, believe me, I will take him away.\nLo, if you have not ",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "To be, or not to be:\nAnd now the Kings incurable of his love,\nAnd put his business to his evil tongue.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 116
+          },
+          "17": {
+            "raw": {
+              "text": "To be, or not to be:\nFor those soft I am not to make thee bad,\nBut with thy foul deeds of my foes and mine.\nMy tongue is not so grievously thou art.\nAnd yet I will write my love to thee,\nWhen I should have done a palm to me",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "To be, or not to be:\nFor those soft I am not to make thee bad,\nBut with thy foul deeds of my foes and mine.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 116
+          },
+          "29": {
+            "raw": {
+              "text": "To be, or not to be: I have no harm,\nBut I will follow thee.\n\nEnter a Servant.\n\nCLOWN:\nNay, I shall not, sir.\n\nExeunt Sir Toby.\n\nOLIVIA:\nTherefore, for you, Malvolio.\n\nPOLIXENES:\nHow long is this?\n\nFIRST SOL",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 2
+              }
+            },
+            "guarded": {
+              "text": "To be, or not to be: I have no harm,\nBut I will follow thee.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 147
+          }
+        },
+        "Friends, Romans, countrymen": {
+          "7": {
+            "raw": {
+              "text": "Friends, Romans, countrymen, Albany, Sir Toby,\nArt the English fatal foe.\n\nBEATRICE:\nAy, and you were born as you see.\n\nMISTRESS PAGE:\nWell, we will not for you.\n\nFIRST MUSICIAN:\nThe garments of our common",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 2
+              }
+            },
+            "guarded": {
+              "text": "Friends, Romans, countrymen, Albany, Sir Toby,\nArt the English fatal foe.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 132
+          },
+          "17": {
+            "raw": {
+              "text": "Friends, Romans, countrymen, I will be yours.\n\nEnter the Great Lady Montague, Sir John Falstaff.\n\nExit Sir Toby and Page.\n\nBARDOLPH:\nFie, how canst thou learn to you wrong?\n\nEnter Falstaff and Page.\n\nFALSTAFF:\n",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 2,
+                "speaker_label_switch_count": 1
+              }
+            },
+            "guarded": {
+              "text": "Friends, Romans, countrymen, I will be yours.\n\nEnter the Great Lady Montague, Sir John Falstaff.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 114
+          },
+          "29": {
+            "raw": {
+              "text": "Friends, Romans, countrymen, and the course.\n\nKING:\nHad you been so long as a sorrow doth deliver\nYour guard, and that you will not be so coldly\nThat I may see you so long against your service\nTo speak with him. You are a cruel of it.\nThis ",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "Friends, Romans, countrymen, and the course.\n\nKING:\nHad you been so long as a sorrow doth deliver\nYour guard, and that you will not be so coldly\nThat I may see you so long against your service\nTo speak with him.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 29
+          }
+        },
+        "All the world's a stage": {
+          "7": {
+            "raw": {
+              "text": "All the world's a stage, or a dame of the power.\n\nFLORIZEL:\nI would not be done; yet I am the way of it.\nMy master is no sorrow, my lord; and I\ncan give her leave with you to serve the court.\n\nPOLIXENES:\nAnd you must say so",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 2,
+                "speaker_label_switch_count": 1
+              }
+            },
+            "guarded": {
+              "text": "All the world's a stage, or a dame of the power.\n\nFLORIZEL:\nI would not be done; yet I am the way of it.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 119
+          },
+          "17": {
+            "raw": {
+              "text": "All the world's a stage, and he that calls himself\nand his bondage and his followers and his sons.\n\nKING HENRY VI:\nMy Lord of Westmoreland, I will not do it.\n\nCLIFFORD:\nWhat would you say?\n\nQUEEN MARGARET:\nThe king is but unkindness to your kingly.\n\nYORK",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 2
+              }
+            },
+            "guarded": {
+              "text": "All the world's a stage, and he that calls himself\nand his bondage and his followers and his sons.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 156
+          },
+          "29": {
+            "raw": {
+              "text": "All the world's a stage,\nAs the fatal and the cheek of two men\nMay seem to be spoke out.\n\nBRUTUS:\nAy, but not a gallant that I should be.\n\nSICINIUS:\nO God, I fear!\n\nCORIOLANUS:\nI have spoke of these service I am so sure",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 2
+              }
+            },
+            "guarded": {
+              "text": "All the world's a stage,\nAs the fatal and the cheek of two men\nMay seem to be spoke out.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 131
+          }
+        }
+      },
+      "v9": {
+        "The king": {
+          "7": {
+            "raw": {
+              "text": "The king is to me and all our sister shall\nWithin this dream.\n\nEnter the Fairies with Aaron, bearing the cardinal.\n\nGLOUCESTER:\nHear you, sir, I think you are not well.\n\nPETRUCHIO:\nNo, my lord.\n\nCRANMER:\nA good Malvolio. I ",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 2
+              }
+            },
+            "guarded": {
+              "text": "The king is to me and all our sister shall\nWithin this dream.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 162
+          },
+          "17": {
+            "raw": {
+              "text": "The king of England shall be delivered.\n\nYORK:\nSweet lord, I think, if you have a son of Suffolk.\nIf you come in this device to your love,\nI would not be your own to my son,\nI should be hanged, but your power to you.\nI will ",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "The king of England shall be delivered.\n\nYORK:\nSweet lord, I think, if you have a son of Suffolk.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 127
+          },
+          "29": {
+            "raw": {
+              "text": "The king of his power,\nShould be the power of this distract.\n\nPANDULPH:\nNo, my lord,\nI think not on the petitions of it.\n\nKING RICHARD:\nWhat say you?\n\nKING RICHARD:\nI think it is thy kingdom, but my sons\nTo give thee from this which thou",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 1,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 1
+              }
+            },
+            "guarded": {
+              "text": "The king of his power,\nShould be the power of this distract.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 177
+          }
+        },
+        "Before we proceed": {
+          "7": {
+            "raw": {
+              "text": "Before we proceed to be of him.\n\nTITUS:\nShould you were not in your patience?\n\nPAROLLES:\nA good good life, sir. I cannot do but know\nThe buggage that I have seen you from the stock.\n\nKING:\nI do desire you, my lord, and you shall have me.\n\n",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 2
+              }
+            },
+            "guarded": {
+              "text": "Before we proceed to be of him.\n\nTITUS:\nShould you were not in your patience?",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 162
+          },
+          "17": {
+            "raw": {
+              "text": "Before we proceed to our fashion.\n\nBOLINGBROKE:\nWhat should we do?\n\nBOLINGBROKE:\nWhere should our fault were to send the fight?\n\nKING RICHARD:\nWhat should we do?\n\nBOLINGBROKE:\nWhat say’st thou, Demetrius? O, didst thou not know\nHow you will seem ",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 3,
+                "duplicate_line_count": 3,
+                "half_sentence_tail": true,
+                "speaker_label_count": 4,
+                "speaker_label_switch_count": 1
+              }
+            },
+            "guarded": {
+              "text": "Before we proceed to our fashion.\n\nBOLINGBROKE:\nWhat should we do?",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 180
+          },
+          "29": {
+            "raw": {
+              "text": "Before we proceed the fruitless cries.\n\nKING:\nWas we in armour of our dangerous kings?\n\nQUEEN:\nAnd what is this the world I mean to be done?\n\nGLOUCESTER:\nWhat say you to a bond in the world?\n\nHAMLET:\nHe is not so much that you did refer him.\n\nGLOU",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 4,
+                "speaker_label_switch_count": 3
+              }
+            },
+            "guarded": {
+              "text": "Before we proceed the fruitless cries.\n\nKING:\nWas we in armour of our dangerous kings?",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 161
+          }
+        },
+        "To be, or not to be:": {
+          "7": {
+            "raw": {
+              "text": "To be, or not to be: I will not stay.\n\nPAROLLES:\nYou shall not hear me.\n\nKING:\nAway, away! I am glad to see my soul.\n\nBERTRAM:\nI will prove that four persons your heads.\n\nKING:\nMy lord, I am sorry to be content.\nI was a king’s father here for",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 1,
+                "half_sentence_tail": true,
+                "speaker_label_count": 4,
+                "speaker_label_switch_count": 2
+              }
+            },
+            "guarded": {
+              "text": "To be, or not to be: I will not stay.\n\nPAROLLES:\nYou shall not hear me.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 171
+          },
+          "17": {
+            "raw": {
+              "text": "To be, or not to be: I’ll make thee wait at thy head.\n\nFALSTAFF:\nI am not for thee.\n\nPRINCE:\nWhy, then, I’ll see thee with thy foul danger.\n\nFALSTAFF:\nI am not at thy commendation. One of my heart of my wishelcock I must\nnot be the base of the field",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 2,
+                "duplicate_line_count": 1,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 1
+              }
+            },
+            "guarded": {
+              "text": "To be, or not to be: I’ll make thee wait at thy head.\n\nFALSTAFF:\nI am not for thee.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 166
+          },
+          "29": {
+            "raw": {
+              "text": "To be, or not to be: I’ll be a dozen.\n\nPROTEUS:\nNo, sir, nor any other thing to see you.\n\nVALENTINE:\nNo more than to you in your hand, but I will have you satisfied.\n\nVALENTINE:\nBut I am glad to you, I think your pleasure is not.\n\nPROTEUS:\nNo",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 2,
+                "half_sentence_tail": true,
+                "speaker_label_count": 4,
+                "speaker_label_switch_count": 1
+              }
+            },
+            "guarded": {
+              "text": "To be, or not to be: I’ll be a dozen.\n\nPROTEUS:\nNo, sir, nor any other thing to see you.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 154
+          }
+        },
+        "Friends, Romans, countrymen": {
+          "7": {
+            "raw": {
+              "text": "Friends, Romans, countrymen,\nWhose heart and embraces bended with blood,\nThe several person of the fiery stars.\nTheir charms have a horn of silken buds,\nThat we have found for cracked and the woods,\nShall not be removed in his vows.\n\nKING JOHN",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "Friends, Romans, countrymen,\nWhose heart and embraces bended with blood,\nThe several person of the fiery stars.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 132
+          },
+          "17": {
+            "raw": {
+              "text": "Friends, Romans, countrymen,\nWhose foul vows are to the other fourteen.\n\nEnter the Bastard.\n\nPEDANT:\nWho hath a man to slander of a dangerous mire?\nWhat should he do?\n\nPALAMON:\nHath he a wonderful staff of that same day?\n\nPALAMON:\nA profane ",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 1,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 1
+              }
+            },
+            "guarded": {
+              "text": "Friends, Romans, countrymen,\nWhose foul vows are to the other fourteen.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 170
+          },
+          "29": {
+            "raw": {
+              "text": "Friends, Romans, countrymen, and their deceitful pounds.\n\nFALSTAFF:\nMadam, I would not have spoke of them.\n\nFALSTAFF:\nI would not be such a foolish to you.\n\nFALSTAFF:\nO, I hope you see you well. Let me see how I shall tell you, I think your\ndispleasure is not so much as ",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 1,
+                "duplicate_line_count": 2,
+                "half_sentence_tail": true,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "Friends, Romans, countrymen, and their deceitful pounds.\n\nFALSTAFF:\nMadam, I would not have spoke of them.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 165
+          }
+        },
+        "All the world's a stage": {
+          "7": {
+            "raw": {
+              "text": "All the worlds a stage,\nAnd the wars of heaven shall be to skin,\nAnd in their passion of the devilish season,\nI can discover thee. Only I will buy\nThy sister thy free extremity to thy son.\n\nKING RICHARD:\nNo more than my brother hath been of thee.\nMy friends",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 1,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "All the worlds a stage,\nAnd the wars of heaven shall be to skin,\nAnd in their passion of the devilish season,\nI can discover thee.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 127
+          },
+          "17": {
+            "raw": {
+              "text": "All the worlds a stage,\nAnd in the valour of the moon’s power.\n\n“And this is all the devil hath done you,\nSince he was mad and to woo this hate,\nThat he hath made me to the world that he went,\nBut I will not fine and all the greetings,\nWhich he that",
+              "flags": {
+                "sentence_terminated": false,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": true,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guarded": {
+              "text": "All the worlds a stage,\nAnd in the valour of the moon’s power.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 187
+          },
+          "29": {
+            "raw": {
+              "text": "All the worlds a stage of thy head,\nAnd thou hast done me in the basket.\n\nLUCIUS:\nI am not for thee, and thou dost not hear.\n\nDEMETRIUS:\nDo thou not hear me?\n\nLYSANDER:\nWhy, so I think thou art as well as thou.\nThou hast no man so much to me. ",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 3,
+                "speaker_label_switch_count": 2
+              }
+            },
+            "guarded": {
+              "text": "All the worlds a stage of thy head,\nAnd thou hast done me in the basket.",
+              "flags": {
+                "sentence_terminated": true,
+                "repeated_trigram_count": 0,
+                "duplicate_line_count": 0,
+                "half_sentence_tail": false,
+                "speaker_label_count": 0,
+                "speaker_label_switch_count": 0
+              }
+            },
+            "guard_removed_characters": 171
+          }
+        }
+      }
+    }
+  }
+}

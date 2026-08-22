@@ -1,4 +1,4 @@
-"""Kaggle v1 launcher for the v14 BPE experiment.
+"""Historical v14 Kaggle launcher for the original BPE experiment.
 
 The launcher fetches the public GitHub snapshot only to reproduce the exact
 repository contents. The training code reads the bundled dataset and performs
@@ -130,12 +130,20 @@ def main() -> None:
             top_p=0.9,
             repetition_penalty=1.05,
             seed=7,
+            min_new_tokens=24,
+            stop_on_sentence_end=True,
         )
 
     summary = {
         "device": str(result["device"]),
         "torch": torch.__version__,
-        "steps": config.train.max_steps,
+        "steps": result["step"],
+        "max_steps": config.train.max_steps,
+        "best_step": result["best_step"],
+        "tokens_seen": result["tokens_seen"],
+        "stopped_early": result["stopped_early"],
+        "stop_reason": result["stop_reason"],
+        "training_seconds": result["training_seconds"],
         "best_val_loss": result["best_val_loss"],
         "last_metrics": result["last_metrics"],
         "perplexity": float(torch.exp(torch.tensor(result["best_val_loss"]))),

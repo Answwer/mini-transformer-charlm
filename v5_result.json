@@ -1,0 +1,40 @@
+{
+  "experiment": "v14_bpe_expanded_optimize_v5",
+  "kaggle_notebook": "https://www.kaggle.com/code/answerr5/mini-transformer-bpe-lm-expanded-optimize-v5",
+  "device": "Tesla P100-PCIE-16GB",
+  "parent_experiment": "v14_bpe_expanded_optimize_v4",
+  "parent_checkpoint_sha256": "369d43e5428f8229fda84a5bcdaee9a20ad11d01ab1a6f64091aed31b9d4874b",
+  "best_step": 64000,
+  "tokens_seen": 262144000,
+  "parameters": 3422208,
+  "expanded_validation_loss": 2.347298836708069,
+  "expanded_validation_ppl": 10.457284707115754,
+  "expanded_test_loss": 1.9996444702148437,
+  "expanded_test_ppl": 7.386429536341573,
+  "old_validation_loss": 1.9136853456497191,
+  "old_validation_ppl": 6.778022180803111,
+  "old_data_ratio": 0.15,
+  "tokenizer_vocab_size": 512,
+  "best_checkpoint_sha256": "b59ca3a20923391979b702cf44c9a4d56162f9c8593524d814ffcf6ba41c6c93",
+  "local_output_directory": "work/kaggle_v5_output",
+  "fixed_prompt_seed": 7,
+  "fixed_prompt_sampling": {
+    "temperature": 0.7,
+    "top_k": 40,
+    "top_p": 0.9,
+    "repetition_penalty": 1.05,
+    "min_new_tokens": 24,
+    "max_new_tokens": 120
+  },
+  "generations": {
+    "The king": "The king, my Lord of Somerset, and you\nSent with him at your sister.\n",
+    "Before we proceed": "Before we proceed,\nAre we to sleep.\n\nExit Falstaff and Soldiers.\n",
+    "To be, or not to be:": "To be, or not to be:\nAnd now the Kings incurable of his love,\nAnd put his business to his evil tongue.\n",
+    "Friends, Romans, countrymen": "Friends, Romans, countrymen, Albany, Sir Toby,\nArt the English fatal foe.\n"
+  },
+  "comparison_to_v4": {
+    "expanded_validation_loss_delta": -0.0036036252975463867,
+    "expanded_test_loss_delta": -0.2325181588532563,
+    "old_validation_loss_delta": -0.007936251163482666
+  }
+}

@@ -1,240 +1,88 @@
-# Mini Transformer Character LM
+# Mini Transformer：v5 正式训练结果
 
-This repository is a small, self-contained character-level causal language
-model built from PyTorch primitives. It trains on the included tiny
-Shakespeare corpus, evaluates on a contiguous held-out suffix, saves a
-reproducible checkpoint, and generates Shakespeare-like character sequences.
+这是一个从零实现的、可复现的小型 Shakespeare 风格英文因果语言模型。模型逐个预测下一个 BPE token，再根据预测结果生成续写文本。它是教学和实验项目，不是问答模型，也不使用预训练权重。
 
-The code is intentionally explicit: the data windows, causal mask, Q/K/V
-projections, attention weights, next-token loss, training loop, and sampling
-logic are all easy to inspect. It does not download a dataset at runtime and
-does not use a pretrained model.
+## 一眼结论
 
-## Requirements
+**v5 是当前正式活动结果。** 它从 v4 的 best.pt 继续训练，保持 512 BPE、4 层 Transformer 和原模型结构不变；在扩容测试集上取得当前最佳结果。v1/v14、v4、v6、v8 和 v9 均作为独立历史或对照保留。
 
-- Python 3.10 or newer
-- PyTorch 2.x (CPU is sufficient; CUDA is used automatically when available)
-
-The project metadata intentionally does not install runtime dependencies for
-you. Install a PyTorch build appropriate for your machine by following the
-official [PyTorch installation selector](https://pytorch.org/get-started/locally/).
-For a CPU-only environment, a typical command is:
-
-```bash
-python -m pip install torch
-```
-
-The source tree is runnable without an editable install because the scripts
-add `src/` to `sys.path`. An editable install is optional:
-
-```bash
-python -m pip install -e .
-```
-
-## Quick start
-
-Run the batch inspection first:
-
-```bash
-python scripts/inspect_batch.py --config configs/tiny.yaml
-```
-
-Run a short CPU smoke training:
-
-```bash
-python scripts/train.py --config configs/tiny.yaml --device cpu --max-steps 200
-```
-
-The normal tiny configuration uses 1,000 steps. It writes only local
-artifacts to `checkpoints/`; `.pt` files are ignored by Git.
-
-Generate from the best checkpoint:
-
-```bash
-python scripts/generate.py \
-  --checkpoint checkpoints/best.pt \
-  --prompt "The " \
-  --max-new-tokens 120 \
-  --temperature 0.8 \
-  --top-k 20 \
-  --seed 7 \
-  --device cpu
-```
-
-Greedy decoding is selected with `--temperature 0`; sampling is selected by
-using a positive temperature. `--top-k` may be omitted to sample from the
-full vocabulary.
-
-## v14 BPE experiment
-
-The original v13 character-level path remains unchanged. The v14 path adds a
-dependency-free BPE tokenizer and a larger small Transformer while reusing the
-same attention, masking, dataset-window, checkpoint, and test code:
-
-```bash
-python scripts/train_v14.py --config configs/v14_bpe.yaml --device cuda
-python scripts/generate_v14.py \
-  --checkpoint checkpoints/v14_bpe/best.pt \
-  --prompt "To be, or not to be:" \
-  --max-new-tokens 120 --temperature 0.7 --top-k 40 --top-p 0.9 --seed 7
-```
-
-The v14 checkpoint uses the current bundled Shakespeare dataset. It is an
-educational from-scratch model: BPE improves word boundaries and local
-coherence, but it does not guarantee that every generated sentence has
-complete semantics.
-
-## Verified run
-
-The repository was also run end-to-end in a private Kaggle Notebook using the
-included corpus and no network download at runtime:
-
-- Kaggle run: [Mini Transformer Character LM v5](https://www.kaggle.com/code/answerr5/mini-transformer-character-lm-v5)
-- PyTorch: `2.10.0+cu128`
-- Tests: `10 passed`
-- Training: `1,000` steps on CPU (Kaggle's Tesla P100 was below this PyTorch
-  build's supported CUDA capability)
-- Final train loss: `2.1624`
-- Final validation loss: `2.1877`
-
-Example generated output from that run:
-
-```text
-The huthee anst thipe tin saustig
-Farnd, at way tout sullind I it sead shind aterer,
-I now int forel and end toe grece, you
-```
-
-This is a deliberately small character model, so the sample has recognizable
-Shakespeare-like punctuation, line breaks, and character patterns but is not
-intended to match a production language model.
-
-## Repository layout
-
-```text
-mini-transformer-charlm/
-├── README.md
-├── LICENSE
-├── pyproject.toml
-├── .gitignore
-├── configs/tiny.yaml
-├── data/
-│   ├── tiny_shakespeare.txt
-│   └── DATASET.md
-├── src/mini_transformer/
-│   ├── config.py       # dataclasses and dependency-free config reader
-│   ├── tokenizer.py    # deterministic character vocabulary
-│   ├── dataset.py      # contiguous 90/10 split and sliding windows
-│   ├── masking.py      # boolean causal mask and scaled attention
-│   ├── attention.py    # multi-head CausalSelfAttention
-│   ├── model.py        # positional encoding, blocks, and LM head
-│   ├── train.py        # AdamW loop, evaluation, and checkpoints
-│   ├── generate.py     # autoregressive decoding
-│   └── utils.py
-├── scripts/
-│   ├── train.py
-│   ├── generate.py
-│   └── inspect_batch.py
-├── tests/
-└── checkpoints/.gitkeep
-```
-
-## Data flow and tensor shapes
-
-The tokenizer maps every character to one id. The four reserved ids are
-stable: `<pad>=0`, `<bos>=1`, `<eos>=2`, and `<unk>=3`. The remaining
-characters are sorted by Unicode code point.
-
-The full character stream is split without shuffling: the first 90% is train
-and the final 10% is validation. For each sampled offset `i`, the dataset
-returns:
-
-```text
-x = ids[i : i + T]       # [T]
-y = ids[i + 1 : i + T + 1] # [T]
-```
-
-After batching, both are `[B, T]`. The model looks up token embeddings and
-adds sinusoidal positions, producing `[B, T, C]`. Each attention layer splits
-this into `[B, H, T, D]`, computes scores `[B, H, T, T]`, masks all future
-positions, and merges heads back to `[B, T, C]`. The final vocabulary
-projection returns logits `[B, T, V]`; cross entropy compares each logit at
-position `t` with the target character at position `t` (which is the next
-character relative to the original stream).
-
-The Transformer blocks use Pre-LayerNorm residual connections:
-
-```text
-x = x + Attention(LayerNorm(x))
-x = x + FFN(LayerNorm(x))
-```
-
-This is a deliberate small-model stability choice. It differs from the
-Post-LN ordering in the original Transformer paper, where normalization is
-placed after each residual addition. The FFN uses ReLU to keep the reference
-implementation close to that paper; changing it to GELU is a modern variant,
-not an accidental implementation detail.
-
-## Default configuration
-
-| Setting | Value |
+| 指标 | v5 结果 |
 | --- | ---: |
-| block size | 128 |
-| layers | 2 |
-| attention heads | 4 |
-| embedding width | 128 |
-| dropout | 0.0 |
-| batch size | 32 |
-| learning rate | 3e-4 |
-| training steps | 1,000 |
+| Expanded validation loss / PPL | **2.347299 / 10.457** |
+| Expanded test loss / PPL | **1.999644 / 7.386** |
+| Old validation loss / PPL | **1.913685 / 6.778** |
+| Best step | **64,000** |
+| Tokens seen | **262.144M** |
+| 参数量 | **3,422,208** |
+| Kaggle 状态 | **COMPLETE** |
+| v5 best.pt SHA-256 | 256775abb523fea7d663908431272aba8aaaf0a43f335eb382d4020459f42b2a |
 
-The implementation asserts that `n_embd % n_head == 0` and checks sequence
-lengths before attention. `--debug-shapes` is not needed because
-`inspect_batch.py` exposes the data boundary and the model tests cover the
-remaining shapes; keeping forward passes free of print statements makes the
-training log readable.
+## 直接查看
 
-## Checkpoints and reproducibility
+- v5 Kaggle Notebook：[Mini Transformer BPE LM Expanded Optimize v5](https://www.kaggle.com/code/answerr5/mini-transformer-bpe-lm-expanded-optimize-v5)
+- v5 训练代码仓库：[mini-transformer-charlm](https://github.com/Answwer/mini-transformer-charlm)
+- 可交付报告：[SUPERVISOR_REPORT.md](SUPERVISOR_REPORT.md)
+- 完整指标：[RESULTS.md](RESULTS.md)
+- 独立 v9 对照仓库：[mini-transformer-bpe1024-dev-v9](https://github.com/Answwer/mini-transformer-bpe1024-dev-v9)
 
-`best.pt` and `last.pt` contain model and optimizer state, model/training
-configuration, tokenizer vocabulary, current step, best validation loss, and
-the seed. Loading uses `map_location`, so a CPU machine can load a checkpoint
-created on CUDA. Training seeds Python and PyTorch (including CUDA when
-available); batch sampling uses dedicated seeded generators for train and
-validation.
+## v5 做了什么
 
-Resume a run with:
+v5 使用扩容后的完整 Shakespeare 作品数据，并从 v4 best.pt 继续训练：
 
-```bash
-python scripts/train.py --config configs/tiny.yaml \
-  --device cpu --resume checkpoints/last.pt
-```
+- tokenizer：512 BPE；
+- 模型：4 层、8 个 attention heads、256 维 embedding、256 token 上下文；
+- 参数量：3,422,208；
+- batch size：16；
+- continuation learning rate：1e-5；
+- 原始数据 replay：15%，用于降低遗忘；
+- optimizer：AdamW，恢复 v4 checkpoint 的 optimizer state；
+- early stopping：以 expanded validation loss 选择 best.pt。
 
-## Tests and debugging order
+v5 不是随机初始化，也不是重新学习 tokenizer；它是同一 512 BPE 体系下从 v4 继续训练的独立实验。
 
-Run all tests with the standard library test runner:
+## 数据
 
-```bash
-python -m unittest discover -s tests -t . -v
-```
+扩容数据文件为 C:\Users\86151\Desktop\dataset-expand.txt，由完整作品重建、格式归一化、作品/段落/n-gram 去重后得到。记录值：
 
-If `pytest` is already installed, the same files can also be collected with:
+- UTF-8 bytes：5,085,615；
+- characters：5,024,557；
+- SHA-256：79edbbbd07a86f58cc14e1447c1242ed1e3f645b08bf996fd307cbcbe586d320；
+- official train/validation/test：30/3/5 部作品。
 
-```bash
-python -m pytest -q
-```
+原始 dataset.txt 从未被修改。训练、验证和测试按作品切分，official test 只在最终评估使用。
 
-The tiny overfit test is the most useful first diagnostic. If it fails,
-inspect the right-shifted targets, the upper-triangular causal mask, the
-`[B, H, T, D]` reshape, the logits/targets flattening, the learning rate, and
-whether the model is in training mode—in that order.
+## 版本对比
 
-## Known limitations and next steps
+| 版本 | 说明 | Expanded val loss | Expanded test loss | Old val loss | Best step |
+| --- | --- | ---: | ---: | ---: | ---: |
+| 历史 v1/v14 | 原始语料历史基线 | 不适用 | 未测 | 2.378887 | 历史最佳点 |
+| v4 | 扩容数据 512 BPE 基线 | 2.350902 | 2.232163 | 1.921622 | 60,000 |
+| **v5** | **从 v4 续训，replay=0.15** | **2.347299** | **1.999644** | 1.913685 | **64,000** |
+| v6 | 从 v4 独立续训，replay=0.10 | 2.344260 | 2.003474 | **1.906484** | 80,000 |
+| v8 | 从 v5 续训，未超过 v5 | 2.347299 | 1.999644 | 1.913685 | 64,000 |
+| v9 | 独立 1024 BPE，从零训练 | 2.663134 | 2.452331 | 2.482651 | 22,000 |
 
-- The tokenizer is character-level, so the vocabulary is simple but sequences
-  are longer than with BPE or SentencePiece.
-- Generation recomputes the entire context at every step and has no KV cache;
-  this is intentionally straightforward and is not production optimized.
-- The project is a teaching/reference implementation, not a production LM.
-- Future extensions could add BPE/SentencePiece, Hugging Face `datasets`,
-  `accelerate`, mixed precision, benchmark tooling, and PEFT/LoRA adapters.
+v6 的 validation 略低，但 test 略高于 v5；v8 没有产生优于 v5 的 checkpoint；v9 训练 token 数明显不足。综合 validation、test 和固定 prompt 稳定性，v5 作为正式结果。
+
+## 生成能力边界
+
+固定 prompt 示例：
+
+    Prompt: The king
+    v5: The king, my Lord of Somerset, and you
+        Sent with him at your sister.
+
+模型可以生成较合理的词边界、标点和舞台文本格式，但仍可能混合角色、作品和场景。sentence-boundary guard 只能减少截断，不能证明完整语义理解。
+
+## 复现 v5
+
+环境要求：Python 3.10+、PyTorch 2.x。项目不在运行时下载数据。
+
+    python -m unittest discover -s tests -t . -v
+    python scripts/train_v14.py --config configs/v5_bpe_expanded_optimize.yaml --resume C:\path\to\v4\best.pt --device cuda
+
+正式评估必须使用 best.pt，不要用训练结束时的 last.pt 代替。v5 的本地输出目录为 work/kaggle_v5_output，历史副本为 work/history_v5_preserved。
+
+## 历史保留规则
+
+所有版本的 Notebook、checkpoint、结果 JSON 和输出目录均独立保存。任何后续 v10 或其他实验都必须使用新的 Notebook、新的输出目录和新的 checkpoint，不得覆盖 v5。

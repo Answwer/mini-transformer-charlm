@@ -37,10 +37,14 @@ class TrainConfig:
     max_steps: int = 1000
     eval_interval: int = 100
     eval_steps: int = 20
+    early_stopping_patience: int = 0
+    early_stopping_min_delta: float = 0.0
     grad_clip: float = 1.0
     seed: int = 1337
     device: str = "auto"
     checkpoint_dir: str = "checkpoints"
+    selection_extra_metric: str | None = None
+    selection_extra_weight: float = 0.0
 
     def __post_init__(self) -> None:
         if self.batch_size <= 0:
@@ -51,8 +55,18 @@ class TrainConfig:
             raise ValueError("max_steps cannot be negative")
         if self.eval_interval <= 0 or self.eval_steps <= 0:
             raise ValueError("eval_interval and eval_steps must be positive")
+        if self.early_stopping_patience < 0:
+            raise ValueError("early_stopping_patience cannot be negative")
+        if self.early_stopping_min_delta < 0:
+            raise ValueError("early_stopping_min_delta cannot be negative")
         if self.grad_clip < 0:
             raise ValueError("grad_clip cannot be negative")
+        if self.selection_extra_weight < 0:
+            raise ValueError("selection_extra_weight cannot be negative")
+        if self.selection_extra_weight > 0 and not self.selection_extra_metric:
+            raise ValueError(
+                "selection_extra_metric is required when selection_extra_weight is positive"
+            )
 
 
 @dataclass
@@ -62,6 +76,11 @@ class ExperimentConfig:
     tokenizer: str = "char"
     bpe_vocab_size: int = 512
     bpe_min_frequency: int = 2
+    replay_data_path: str | None = None
+    split_manifest_path: str | None = None
+    development_manifest_path: str | None = None
+    old_data_ratio: float = 0.0
+    reset_best_on_resume: bool = False
     model: ModelConfig = field(default_factory=ModelConfig)
     train: TrainConfig = field(default_factory=TrainConfig)
 
@@ -74,6 +93,10 @@ class ExperimentConfig:
             raise ValueError("bpe_vocab_size must be greater than 4")
         if self.bpe_min_frequency <= 0:
             raise ValueError("bpe_min_frequency must be positive")
+        if not 0.0 <= self.old_data_ratio < 1.0:
+            raise ValueError("old_data_ratio must be in [0, 1)")
+        if self.old_data_ratio > 0.0 and not self.replay_data_path:
+            raise ValueError("replay_data_path is required when old_data_ratio is positive")
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -82,6 +105,11 @@ class ExperimentConfig:
             "tokenizer": self.tokenizer,
             "bpe_vocab_size": self.bpe_vocab_size,
             "bpe_min_frequency": self.bpe_min_frequency,
+            "replay_data_path": self.replay_data_path,
+            "split_manifest_path": self.split_manifest_path,
+            "development_manifest_path": self.development_manifest_path,
+            "old_data_ratio": self.old_data_ratio,
+            "reset_best_on_resume": self.reset_best_on_resume,
             "model": asdict(self.model),
             "train": asdict(self.train),
         }
@@ -139,10 +167,14 @@ def load_config(path: str | Path) -> ExperimentConfig:
         "max_steps",
         "eval_interval",
         "eval_steps",
+        "early_stopping_patience",
+        "early_stopping_min_delta",
         "grad_clip",
         "seed",
         "device",
         "checkpoint_dir",
+        "selection_extra_metric",
+        "selection_extra_weight",
     }
     model = ModelConfig(**{key: raw[key] for key in model_keys if key in raw})
     train = TrainConfig(**{key: raw[key] for key in train_keys if key in raw})
@@ -152,6 +184,23 @@ def load_config(path: str | Path) -> ExperimentConfig:
         tokenizer=str(raw.get("tokenizer", "char")),
         bpe_vocab_size=int(raw.get("bpe_vocab_size", 512)),
         bpe_min_frequency=int(raw.get("bpe_min_frequency", 2)),
+        replay_data_path=(
+            None
+            if raw.get("replay_data_path") in {None, "", "null"}
+            else str(raw["replay_data_path"])
+        ),
+        split_manifest_path=(
+            None
+            if raw.get("split_manifest_path") in {None, "", "null"}
+            else str(raw["split_manifest_path"])
+        ),
+        development_manifest_path=(
+            None
+            if raw.get("development_manifest_path") in {None, "", "null"}
+            else str(raw["development_manifest_path"])
+        ),
+        old_data_ratio=float(raw.get("old_data_ratio", 0.0)),
+        reset_best_on_resume=bool(raw.get("reset_best_on_resume", False)),
         model=model,
         train=train,
     )

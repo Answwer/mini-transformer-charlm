@@ -1,0 +1,49 @@
+{
+  "experiment": "v14_bpe_expanded_optimize_v6",
+  "kaggle_notebook": "https://www.kaggle.com/code/answerr5/mini-transformer-bpe-lm-expanded-optimize-v6",
+  "device": "Tesla P100-PCIE-16GB",
+  "parent_experiment": "v14_bpe_expanded_optimize_v4",
+  "parent_checkpoint_sha256": "369d43e5428f8229fda84a5bcdaee9a20ad11d01ab1a6f64091aed31b9d4874b",
+  "best_step": 80000,
+  "tokens_seen": 327680000,
+  "parameters": 3422208,
+  "expanded_validation_loss": 2.3442599058151243,
+  "expanded_validation_ppl": 10.425553979726546,
+  "expanded_test_loss": 2.0034739136695863,
+  "expanded_test_ppl": 7.414769679438026,
+  "old_validation_loss": 1.9064838767051697,
+  "old_validation_ppl": 6.72938580144507,
+  "old_data_ratio": 0.1,
+  "tokenizer_vocab_size": 512,
+  "best_checkpoint_sha256": "3e01a1df97b1498c1ce5899397f9aea2dc3ecd8ad6b6921e7d6e4d6b3b3033cd",
+  "local_output_directory": "work/kaggle_v6_output",
+  "fixed_prompt_seed": 7,
+  "fixed_prompt_sampling": {
+    "temperature": 0.7,
+    "top_k": 40,
+    "top_p": 0.9,
+    "repetition_penalty": 1.05,
+    "min_new_tokens": 24,
+    "max_new_tokens": 120
+  },
+  "generations": {
+    "The king": "The king hath sent to me and Ill pay the way.\n\n\n",
+    "Before we proceed": "Before we proceed,\nAre we to sleep.\n\nExit Falstaff and Soldiers.\n",
+    "To be, or not to be:": "To be, or not to be:\nAnd now the Kings incur, when the Duke of York.\n",
+    "Friends, Romans, countrymen": "Friends, Romans, countrymen, with a flower, and a\ncolour of them are a fool.\n"
+  },
+  "comparison_to_v4": {
+    "expanded_validation_loss_delta": -0.0066425561904907,
+    "expanded_validation_ppl_delta": -0.0694828444911,
+    "expanded_test_loss_delta": -0.2286887150279,
+    "expanded_test_ppl_delta": -1.905230320562,
+    "old_validation_loss_delta": -0.0151377201080322
+  },
+  "comparison_to_v5": {
+    "expanded_validation_loss_delta": -0.0030389308929443,
+    "expanded_validation_ppl_delta": -0.0317307273892,
+    "expanded_test_loss_delta": 0.003829443455,
+    "expanded_test_ppl_delta": 0.0283401430965,
+    "old_validation_loss_delta": -0.0072014689445496
+  }
+}

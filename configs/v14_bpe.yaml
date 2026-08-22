@@ -16,6 +16,8 @@ learning_rate: 0.0003
 max_steps: 120000
 eval_interval: 2000
 eval_steps: 5
+early_stopping_patience: 8
+early_stopping_min_delta: 0.001
 grad_clip: 1.0
 seed: 1337
 device: auto

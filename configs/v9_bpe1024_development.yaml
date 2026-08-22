@@ -1,0 +1,32 @@
+# Independent second-group experiment: 1024 BPE from scratch.
+# The v5 checkpoint is a read-only comparison baseline, not a parent.
+data_path: data/expanded/dataset-expand.txt
+replay_data_path: data/tiny_shakespeare.txt
+split_manifest_path: data/expanded/format_report.json
+development_manifest_path: data/expanded/development_manifest_v9.json
+old_data_ratio: 0.0
+reset_best_on_resume: false
+train_split: 0.9
+tokenizer: bpe
+bpe_vocab_size: 1024
+bpe_min_frequency: 2
+
+block_size: 256
+n_layer: 4
+n_head: 8
+n_embd: 256
+dropout: 0.1
+
+batch_size: 16
+learning_rate: 0.0003
+max_steps: 70000
+eval_interval: 1000
+eval_steps: 10
+early_stopping_patience: 8
+early_stopping_min_delta: 0.0002
+grad_clip: 1.0
+seed: 1337
+device: auto
+checkpoint_dir: checkpoints/v14_bpe1024_development_v9
+selection_extra_metric: development_validation
+selection_extra_weight: 0.5

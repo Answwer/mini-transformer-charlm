@@ -11,6 +11,9 @@ htmlcov/
 checkpoints/*.pt
 checkpoints/*.pth
 checkpoints/*.json
+checkpoints/**/*.pt
+checkpoints/**/*.pth
+checkpoints/**/*.json
 logs/
 outputs/
 work/
