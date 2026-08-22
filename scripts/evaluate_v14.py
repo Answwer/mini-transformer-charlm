@@ -48,7 +48,11 @@ def split_texts(report_path: Path, text: str) -> dict[str, str]:
         if split not in groups:
             raise ValueError(f"invalid split: {split}")
         groups[split].append(text[int(record["char_start"]) : int(record["char_end"])])
-    return {key: "\n\n".join(value) for key, value in groups.items()}
+    return {
+        key: "\n\n".join(value)
+        for key, value in groups.items()
+        if value
+    }
 
 
 def split_loss(
