@@ -89,6 +89,8 @@ v5 作为正式结果的原因：
 
 ## 平台状态
 
+主仓库只发布 v5 可复现代码；历史版本只保留结果 JSON 和本报告中的对比证据。历史 Notebook、checkpoint 和独立输出仍保存在本机/Kaggle，不会被删除。
+
 - 主 GitHub 仓库：[Answwer/mini-transformer-charlm](https://github.com/Answwer/mini-transformer-charlm)
 - 独立 v9 GitHub 仓库：[Answwer/mini-transformer-bpe1024-dev-v9](https://github.com/Answwer/mini-transformer-bpe1024-dev-v9)
 - v9 PR：[PR #1](https://github.com/Answwer/mini-transformer-bpe1024-dev-v9/pull/1)，保留为独立对照记录；

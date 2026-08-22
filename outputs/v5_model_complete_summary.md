@@ -248,8 +248,8 @@ v7 的绝对 loss 使用 `eval_steps=100`，与 v5/v6 历史报告使用的 `eva
 - v6 指标：`v6_result.json`
 - v7 完整诊断：`work/kaggle_v7_diagnostic_output/mini-transformer-charlm/v7_diagnostic_result.json`
 - v5 配置：`configs/v5_bpe_expanded_optimize.yaml`
-- 评估脚本：`scripts/evaluate_v14.py`
-- 训练脚本：`scripts/train_v14.py`
+- 评估脚本：`scripts/evaluate_v5.py`
+- 训练脚本：`scripts/train_v5.py`
 - 规划文件：`C:\Users\86151\Documents\Codex\2026-08-19\python-torch-transformers-datasets-accelerate-peft-5\outputs\transformer_repo_plan_for_luna_xhigh.md`
 
 ## 13. 基于 v7 诊断的 v8 续训结果
